@@ -154,6 +154,7 @@ contained transparency occurs when a government organization is in the process o
 
 ## compiled review
 LOT OF WORK TO DO HERE
+
 ![work work work](https://media.giphy.com/media/jMs9NVfjvYgfK/giphy.gif)
 
 # synthesis
