@@ -119,38 +119,71 @@ creating a model for understanding the various types of transparency will allow 
 ## conceptual framework
 
 ### empty
-|     | radical | reasoned | false
-| --- | --- | --- | ---
-| proactive | ????? | ????? | ?????
-| *example-p* | ????? | ????? | ?????
-| reactive | ????? | ????? | ?????
-| *example-r* | ????? | ????? | ?????
+|     | false negative | reasoned | false positive | radical
+| --- | --- | --- | --- | ---
+| proactive | ????? | ????? | ????? | ?????
+| *example-p* | ????? | ????? | ????? | ?????
+| reactive | ????? | ????? | ????? | ?????
+| *example-r* | ????? | ????? | ????? | ?????
 
-*additional exploration required*
+transparency is an axis, where false transparency are the gaps, positive or negative, from the assumed reasoned transparency
 
-|     | radical | reasoned | false
-| --- | --- | --- | ---
-| adaptive | ????? | ????? | ?????
-| *example-a* | ????? | ????? | ?????
+**false negative:**
+   1. the data available has less information than what the organization established as public knowledge
+   2. the data present reveals that the organization's label of reasoned transparency is too boastful of what is actually present, due to accident or intention
 
-### proposed fill
-|     | radical | reasoned | false
+**reasoned:**
+   1. the data available contains approximately what the organization established as public knowledge
+   2. the data present reveals competence and understanding in the level of transparency desired by the organization
+
+**false positive:**
+   1. the data available contains more information than what the organization established as public knowledge
+   2. the data present reveals that the organization's label of reasoned transparency is understated of what is actually present, due to accident or intention
+
+**radical:**
+   1. the data available contains all possible information from the organization and is established as public knowledge
+
+**interactions:**
+   1. it is important to note that this should be read on an axis, where minimal is on one side and radical transparency on the other
+   2. at some point along the axis, an organization has their own individual reasoned transparency, whether it be more towards minimal, or radical transparency is determined by their internal methods
+   3. their real transparency, is another point on the axis that is determined by the organizations constituents and where they believe the real transparency actually is
+   4. the space between the points can then be labeled by the above definitions
+
+**example:**
+
+![false negative transparency organization](false-negative-transparency.PNG)
+
+in this example, there is a false negative transparency, exaggerated, from what the organization claims is available for public knowledge vs. what the public actual deems is available for public knowledge.
+
+![true reasoned transparency organization](true-reasoned-transparency.PNG)
+
+in this example, while there is a slight false negative transparency, the organization is claiming near radical transparency in their public knowledge data, and the public agrees that is near radical transparency, thus making the separation ignorable, resulting in a true reasoned transparency.
+
+>### proposed fill
+|     | false negative | reasoned | false positive | radical
+| --- | --- | --- | --- | ---
+| proactive | ????? | ????? | ????? | ?????
+| *example-p* | ????? | ????? | ????? | ?????
+| reactive | ????? | ????? | ????? | ?????
+| *example-r* | ????? | ????? | ????? | ?????
+
+>|     | radical | reasoned | false
 | --- | --- | --- | ---
 | proactive | aimless | dedicated | revealed
 | *example-p* | *data.gov* | *statement* | *wikileaks*
 | reactive | covered | contained | combative
 | *example-r* | *report* | *hearing* | ?????
 
-*additional exploration required*
+>*additional exploration required*
 
-|     | radical | reasoned | false
+>|     | radical | reasoned | false
 | --- | --- | --- | ---
 | adaptive | ????? | ????? | ?????
 | *example-a* | ????? | ????? | ?????
 
-**example:** you can apply each category to transparency as a method and state
+>**example:** you can apply each category to transparency as a method and state
 
-contained transparency occurs when a government organization is in the process of changing the understanding of information released through reasoning
+>contained transparency occurs when a government organization is in the process of changing the understanding of information released through reasoning
 
 ## compiled review
 LOT OF WORK TO DO HERE
