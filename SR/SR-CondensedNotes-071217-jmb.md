@@ -196,7 +196,6 @@ LOT OF WORK TO DO HERE
 ![work work work](https://media.giphy.com/media/jMs9NVfjvYgfK/giphy.gif)
 
 ### Concepts to Cover
-
 - [Civic Technology](#civic-technology)
    - [Voting](#voting)
    - [Resident Feedback](#resident-feedback)
@@ -204,6 +203,9 @@ LOT OF WORK TO DO HERE
       - [Information Crowdsourcing](#information-crowdsourcing)
       - [Open Data](#open-data)
       - [Data Leak](#data-leak)
+
+### Civic Technology
+there have been many definitions proposed
 
 # synthesis
 summary after review
