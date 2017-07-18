@@ -118,15 +118,33 @@ creating a model for understanding the various types of transparency will allow 
 
 ## conceptual framework
 
-### empty
-|     | false negative | reasoned | false positive | radical
-| --- | --- | --- | --- | ---
-| proactive | ????? | ????? | ????? | ?????
-| *example-p* | ????? | ????? | ????? | ?????
-| reactive | ????? | ????? | ????? | ?????
-| *example-r* | ????? | ????? | ????? | ?????
+### multiple models for explaining transparency
+1. [matrix](#maxtrix-transparency)
+2. [single dimension classified](#single-dimension-classified-transparency)
+3. [two dimensional](#two-dimensional-transparency)
+4. [other models for transparency](#other-models-for-transparency)
 
-transparency is an axis, where false transparency are the gaps, positive or negative, from the assumed reasoned transparency
+### matrix transparency
+to be used when simple classification is desired
+
+##### template
+|     | reasoned | radical
+| --- | --- | ---
+| proactive | ????? | ?????
+| *example-p* | ????? | ?????
+| reactive | ????? | ?????
+| *example-r* | ????? | ?????
+
+##### filled
+|     | reasoned | radical
+| --- | --- | ---
+| proactive | dedicated | indiscriminate
+| *example-p* | *press release* | *data.gov*
+| reactive | contained | reconciled
+| *example-r* | *hearing* | *report*
+
+### single dimension classified transparency
+to be used when classification of proactive or reactive is simple but transparency is complex
 
 **false negative:**
    1. the data available has less information than what the organization established as public knowledge
@@ -159,36 +177,33 @@ in this example, there is a false negative transparency, exaggerated, from what 
 
 in this example, while there is a slight false negative transparency, the organization is claiming near radical transparency in their public knowledge data, and the public agrees that is near radical transparency, thus making the separation ignorable, resulting in a true reasoned transparency.
 
->### proposed fill
-|     | false negative | reasoned | false positive | radical
-| --- | --- | --- | --- | ---
-| proactive | ????? | ????? | ????? | ?????
-| *example-p* | ????? | ????? | ????? | ?????
-| reactive | ????? | ????? | ????? | ?????
-| *example-r* | ????? | ????? | ????? | ?????
+### two dimensional transparency
+utilizing single dimensional classified transparency for definitions for the x axis,
+use the y axis to describe the complexity of action.
 
->|     | radical | reasoned | false
-| --- | --- | --- | ---
-| proactive | aimless | dedicated | revealed
-| *example-p* | *data.gov* | *statement* | *wikileaks*
-| reactive | covered | contained | combative
-| *example-r* | *report* | *hearing* | ?????
+![two dimensional transparency graph](two-dimensional-transparency.PNG)
 
->*additional exploration required*
+### other models for transparency
+while not necessarily a differing model from matrix transparency, the original definition proposed for **reasoned transparency** came from 'The Transparency President' and was described as simply *'government officials offering explicit explanations for their actions.'*
 
->|     | radical | reasoned | false
-| --- | --- | --- | ---
-| adaptive | ????? | ????? | ?????
-| *example-a* | ????? | ????? | ?????
+this definition works well for understanding a singular concept however it doesn't allow for insight into interactions between multiple concepts of transparency, action (reactive to proactive), state (minimal to radical), and importantly: falsity (organizational insincerity).
 
->**example:** you can apply each category to transparency as a method and state
-
->contained transparency occurs when a government organization is in the process of changing the understanding of information released through reasoning
+due to this definition of **reasoned transparency**, we propose the definition of *'what data government officials establish is public knowledge'* to allow for interaction between concepts.
 
 ## compiled review
 LOT OF WORK TO DO HERE
 
 ![work work work](https://media.giphy.com/media/jMs9NVfjvYgfK/giphy.gif)
+
+### Concepts to Cover
+
+- [Civic Technology](#civic-technology)
+   - [Voting](#voting)
+   - [Resident Feedback](#resident-feedback)
+   - [Data Access](#data-access)
+      - [Information Crowdsourcing](#information-crowdsourcing)
+      - [Open Data](#open-data)
+      - [Data Leak](#data-leak)
 
 # synthesis
 summary after review
