@@ -1,5 +1,5 @@
 
-current govtech: 'The result is that old procedures, processes and organizational forms were just encoded in software. Huge unwieldy mainframe beats not only cemented old ways of working, they required still greater levels of bureaucracy to plan, implement, operate, and control them.'
+current govtech: 'The result is that old procedures, processes and organizational forms were just encoded in software. Huge unwieldy mainframe beats not only cemented old ways of working, they required still greater levels of bureaucracy to plan, implement, operate, and control them.' (foreword)
 
 first wave e-government: 'many of these initiatives simply paved the cow paths--that is, they focused on automating existing processes and moving existing government services online.'
 

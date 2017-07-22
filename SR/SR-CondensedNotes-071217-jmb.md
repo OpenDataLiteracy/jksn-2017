@@ -43,7 +43,7 @@ expanding this from citizenship to the actual technology being discussed, allows
 
 regardless of how you choose define civic technology, whatever scope you have, you can still see the expansion and creation of more civic technologies. as the knight foundation claims, for the past 12 years, civic technology has been growing consistently about 23% every 4 years.
 
-![civic technology company growth over time](knight-civic-tech-growth.PNG)
+![civic technology company growth over time](images/knight-civic-tech-growth.PNG)
 
 with an estimated 192 varying civic technology companies in 2012.
 
@@ -169,11 +169,11 @@ to be used when classification of proactive or reactive is simple but transparen
 
 **example:**
 
-![false negative transparency organization](false-negative-transparency.PNG)
+![false negative transparency organization](images/false-negative-transparency.PNG)
 
 in this example, there is a false negative transparency, exaggerated, from what the organization claims is available for public knowledge vs. what the public actual deems is available for public knowledge.
 
-![true reasoned transparency organization](true-reasoned-transparency.PNG)
+![true reasoned transparency organization](images/true-reasoned-transparency.PNG)
 
 in this example, while there is a slight false negative transparency, the organization is claiming near radical transparency in their public knowledge data, and the public agrees that is near radical transparency, thus making the separation ignorable, resulting in a true reasoned transparency.
 
@@ -181,7 +181,7 @@ in this example, while there is a slight false negative transparency, the organi
 utilizing single dimensional classified transparency for definitions for the x axis,
 use the y axis to describe the complexity of action.
 
-![two dimensional transparency graph](two-dimensional-transparency.PNG)
+![two dimensional transparency graph](images/two-dimensional-transparency.PNG)
 
 ### other models for transparency
 while not necessarily a differing model from matrix transparency, the original definition proposed for **reasoned transparency** came from 'The Transparency President' and was described as simply *'government officials offering explicit explanations for their actions.'*
@@ -196,16 +196,13 @@ LOT OF WORK TO DO HERE
 ![work work work](https://media.giphy.com/media/jMs9NVfjvYgfK/giphy.gif)
 
 ### Concepts to Cover
-- [Civic Technology](#civic-technology)
+- [Civic Technology](SR-CivicTechnologyOverview-18072017-jmb.md)
    - [Voting](#voting)
    - [Resident Feedback](#resident-feedback)
    - [Data Access](#data-access)
       - [Information Crowdsourcing](#information-crowdsourcing)
       - [Open Data](#open-data)
       - [Data Leak](#data-leak)
-
-### Civic Technology
-there have been many definitions proposed
 
 ## synthesis
 summary after review
