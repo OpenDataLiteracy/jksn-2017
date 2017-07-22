@@ -207,7 +207,7 @@ LOT OF WORK TO DO HERE
 ### Civic Technology
 there have been many definitions proposed
 
-# synthesis
+## synthesis
 summary after review
 
 its a tl;dr: of a tl;dr....
