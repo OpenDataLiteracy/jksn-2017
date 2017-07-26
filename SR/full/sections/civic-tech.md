@@ -1,14 +1,6 @@
-## to be merged with full paper
-current notes and comments are being pulled from:
-- knight foundation readings
-- open government readings
-- transparency president
-- wikileaks illusion of transparency
-- ... (more to add after further full notes review)
+[Back to Review](../SR-WorkingReview-25072017-jmb.md)
 
-[list of citations so far or planned](cite.md)
-
-## Civic Technology
+# Civic Technology
 As more and more of the world becomes interconnected with various technology sources and information streams, governments have been faced with a tall order. Dated technology and slow to upgrade agencies have left the government with 'old procedures, processes and organizational forms... encoded in software. Requiring greater levels of bureaucracy to plan, implement, operate, and control them.' (Lathrop & Ruma)
 
 Outdated technology isn't the only problem that existed when multiple government agencies tried to upgrade their systems and bring more information online. 'Many of these initiatives simply... focused on automating existing process and moving existing government services online.' (Lathrop & Ruma) And this is where the main problem lies and what civic technology fights back against.
@@ -36,3 +28,7 @@ Let me address the bulk of that definition and why each part pertains to transpa
 'Giving transparent insight into process.' Processes, knowing what is happening inside a public institution, or understanding how, or why something is happening is a constant request by many civic technologists. If a technology innovates and delivers a new method for explaining government processes and ensuring accountability in their method it should be rewarded and encouraged by the officials it targets.
 
 And lastly, 'generally improving the public good.' The catch all. But again, I don't mean a catch all for all types of civic technology. In this case, a public for transparency would be a data repository, or a knowledge base, etc. There are many transparency technologies that focus exactly on that, storing, sorting, and filtering large sums of government information into more readable, digestible parts. WikiLeaks is a common example of a document library focused on transparency. And while the public opinion of it's motives and direction are questioned, it is undeniably a data repository for government leak and transparency documentation.
+
+[Back to Review](../../SR-WorkingReview-25072017-jmb.md)
+
+[Back to Top](#civic-technology)
