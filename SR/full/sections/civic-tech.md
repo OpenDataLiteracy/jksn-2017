@@ -17,7 +17,7 @@ The World Wide Web can be seen as a civic technology mainly due to it's 'opennes
 
 However, while civic technology can encompass nearly all ranges of technologies. We also need specificity. In our case, we will be address civic transparency technologies.
 
-My own personal definition: 'usually information technology, any technology that enables community, organization, or citizen engagement with public services; encouraging citizen communication, improving government infrastructure, giving transparent insight into process, and generally improving the public good.'
+My own personal definition: 'Usually information technology, any technology that enables community, organization, or citizen engagement with public services; encouraging citizen communication, improving government infrastructure, giving transparent insight into process, and generally improving the public good.'
 
 Let me address the bulk of that definition and why each part pertains to transparency in some way or another.
 
@@ -28,6 +28,8 @@ Let me address the bulk of that definition and why each part pertains to transpa
 'Giving transparent insight into process.' Processes, knowing what is happening inside a public institution, or understanding how, or why something is happening is a constant request by many civic technologists. If a technology innovates and delivers a new method for explaining government processes and ensuring accountability in their method it should be rewarded and encouraged by the officials it targets.
 
 And lastly, 'generally improving the public good.' The catch all. But again, I don't mean a catch all for all types of civic technology. In this case, a public for transparency would be a data repository, or a knowledge base, etc. There are many transparency technologies that focus exactly on that, storing, sorting, and filtering large sums of government information into more readable, digestible parts. WikiLeaks is a common example of a document library focused on transparency. And while the public opinion of it's motives and direction are questioned, it is undeniably a data repository for government leak and transparency documentation.
+
+Throughout the rest of this review we will briefly discuss voting technologies and then dive deeper in to data utility technologies as they relate to transparency.
 
 [Back to Review](../../SR-WorkingReview-25072017-jmb.md)
 

@@ -12,8 +12,8 @@ University of Washington, Seattle Washington, USA
 - [Conceptual Framework](full/framework.md)
 - Review
    - [Civic Technology Overview](full/sections/civic-tech.md)
-   - [Voting Technology](full/sections/SR-VotingTechnology.md)
-   - [Data Access](full/sections/SR-DataAccess.md)
+   - [Voting Technology](full/sections/voting-tech.md)
+   - [Data Access](full/sections/data-access.md)
       - [Information Crowdsourcing](full/sections/SR-InfoCrowdsourcing.md)
       - [Open Data](full/sections/SR-OpenData.md)
       - [Data Leak](full/sections/SR-DataLeak.md)

@@ -6,6 +6,7 @@
 2. [nic-initial](#nic-initial-26062017)
 3. [condensed-initial](#condensed-initial-12072017)
 4. [formatted-and-updated](#formatted-and-updated-24072017)
+5. [main-revision-one](#main-revision-one-31072017)
 
 ## Mid-June-16062017
 Providing an understanding of academia's research into applications, benefits, and more into open governments, open data, and e-democracy. Giving insight into what it means for an open government to have data leak. Providing context for topics surrounding false transparency.
@@ -26,6 +27,9 @@ Civic technologies are often lauded for their transformative potential to reduce
 3. False Transparency, which includes civic technologies that expose gaps between state activities and public knowledge.
 
 Through this review we highlight a number of ways in which the transformative potential of civic technologies is indeed being realized to great effect, as well the shortcomings of those efforts.
+
+## Main-Revision-One-31072017
+Over the last decade innovations in information communication technologies have had a transformative effect on interactions between citizens and their government - creating the potential for greater accountability and more meaningful engagement. But, ICTs have also been shaped by citizen demands for greater government transparency, and in particular access to information in readily usable, digital forms. Emerging 'civic technologies' for transparency therefore depend upon accurate, trustworthy, and timely release of government information. In the following paper we describe innovations in civic technologies that facilitate three forms of government transparency through information release: 1. Proactive Transparency, which includes open data initiatives to release machine-readable structured information to the public; 2. Reactive Transparency, which includes responses to public records requests, and compliance with freedom of information laws, and; 3. False Transparency, which includes civic technologies that expose gaps between state actions and actors, and their public disclosures. We conclude with a discussion of the potential futures for civic technologies to facilitate reasoned, accountable, and radical forms of transparency.
 
 [Back to Current Abstract](abstract.md)
 
