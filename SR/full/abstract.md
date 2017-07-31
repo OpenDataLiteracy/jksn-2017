@@ -4,24 +4,16 @@
 
 [Abstract Versions](abstract-versioning.md)
 
-Civic technologies are often lauded for their transformative potential to reduce the barrier between citizens and their government - creating government accountability through various modes of state transparency. Central to the value proposition of civic technology for transparency is the need for accurate, trustworthy, and timely release of government information. In this paper we review the evolution and growth of civic technologies that capitalize on three forms of government transparency:
-
-1. Proactive Transparency, which includes open data initiatives to release machine-readable structured information to the public
-
-2. Reactive Transparency, which includes responses to public records requests, and compliance with freedom of information laws
-
-3. False Transparency, which includes civic technologies that expose gaps between state activities and public knowledge.
-
-Through this review we highlight a number of ways in which the transformative potential of civic technologies is indeed being realized to great effect, as well the shortcomings of those efforts.
+Over the last decade innovations in information communication technologies have had a transformative effect on interactions between citizens and their government - creating the potential for greater accountability and more meaningful engagement. But, ICTs have also been shaped by citizen demands for greater government transparency, and in particular access to information in readily usable, digital forms. Emerging 'civic technologies' for transparency therefore depend upon accurate, trustworthy, and timely release of government information. In the following paper we describe innovations in civic technologies that facilitate three forms of government transparency through information release: 1. Proactive Transparency, which includes open data initiatives to release machine-readable structured information to the public; 2. Reactive Transparency, which includes responses to public records requests, and compliance with freedom of information laws, and; 3. False Transparency, which includes civic technologies that expose gaps between state actions and actors, and their public discolosures. We conclude with a discussion of the potential futures for civic technologies to facilitate reasoned, accountable, and radical forms of transparency.  
 
 
 ## Research Questions:
 
-* What are the results of research into the creation and use of civic transparency technologies?
+In the following sections we seek to answer two specific research questions. 
 
-* How has research, development, or design practices within civic technology changed over the last decade? To what ends?
+* First, how have research, development, or design practices within civic technology changed over the last decade? What events, innovations, or regime changes have influenced this evolution?
 
-* Are there recorded governmental reaction in response to the use of civic transparency technologies? Why and How.
+* Second, As civic technologies have matured, what are the forms of transparency that they facilitate? How do these forms of transparency support, or prohibit government accountability?
 
 
 ## Key Terms:
@@ -35,12 +27,34 @@ civic technology, engagement technology, civic engagement, voting technology, ci
 
 'Usually information technology, any technology that enables community, organization, or citizen engagement with public services; encouraging citizen communication, improving government infrastructure, generally improving the public good.' - Team, on generalized civic technology
 
-'Usually information technology, any technology that not only enables a community, organization, or citizen engagement with public services, but additionally, may improve government infrastructure, provide transparent insight into process and outcomes, or allow self-selected participation.' - Team, on transparency technology
+'Usually information technology, any technology that not only enables a community, organization, or citizen engagement with public services, but additionally, may improve government infrastructure, provide transparent insight into process and outcomes, or allow self-selected participation.' - Team, on transparency technology < --- Where is this from? 
+
+"offer opportunities to form ecologies of people, practices and ‘data forms for generating, viewing and possibly analysing data’ in matters of civic concern" (Taylor et al. 2015)
+
+
+We have to have more definitons. 
 
 #### Transparency:
 *Need to find and generate our own definitions for transparency*
 
 *Open Government has a couple of definitions for transparency, ranging from data transparency, to participation transparency*
+
+
+See: 
+
+Relly and Sabharwal. 2009. Perceptions of transparency of government policymaking: A cross- national study. Government Information Quarterly 26:148-157.
+
+Florini, Ann. 2002. ‘Increasing Transparency in Government’, International Journal on World Peace 19(3): 3-37.
+
+Grigorescu, Alexandru. 2003. ‘International Organizations and Government Transparency: Linking the International and Domestic Realms’, International Studies Quarterly 47(4): 643-667.
+
+Lindstedt, Catharina, and Daniel Naurin. 2010. Transparency is not Enough: Making Transparency Effective in Reducing Corruption, International Political Science Review, 31: 301-322.
+
+"...the doc- trine that the general conduct of executive government should be predictable and operate according to published (and as far as possible non-discretionary) rules rather than arbitrarily" (Hood 2006, 14).
+
+Bauhr and Grimes suggest that a general defintion of transparency lacks measurable criteria, and therefore any operationalized study of transparency will be lacking. Instead, they suggest that government transparency can be measured along three principal dimmensions government openness, whistleblower protection, and likelihood of expsoure (or, more simply 'publicity') (Bauhr and Grimes, 2012). Although they caution against causal attribution, in a survey of public administration experts representing 52 countries, they demonstrate that these measures indicate "Countries rated as more transparent along the dimensions of access to information and publicity also tend to have less corruption, and to a greater extent honor other basic human rights and liberties."
+
+
 
 #### Voting:
 'Traditional method in democracies for citizen input on a piece of legislation, an organization, or representative. Voting systems however can encompass multiple areas, voting systems in a mathematical and economic sense are how votes are counted, sorted, etc. In a civic technology sense, voting systems are the systems in place to record and store voting records to a level of transparency that all parties agree upon.'
