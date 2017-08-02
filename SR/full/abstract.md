@@ -30,9 +30,10 @@ civic technology, engagement technology, civic engagement, voting technology, ci
 
 "the design and use of technology to support both formal and informal aspects of government and public services" (Boehner and DiSalvo, 2016) 
 
+"Online and digital technologies that enable citizens to hold governments to account" (Rumbul, 2015) 
+
 Civic technologies are occasionaly described in terms of affordances (Taylor et al. 2015), such that they offer new opprotunities for "ecologies of people, practices and data forms for generating, viewing and possibly analysing data in matters of civic concern" (Balestrini et al., 2017). 
 
-We have to have more definitons. 
 
 #### Transparency:
 *Need to find and generate our own definitions for transparency*
