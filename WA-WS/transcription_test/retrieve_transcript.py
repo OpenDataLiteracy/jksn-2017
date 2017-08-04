@@ -51,18 +51,73 @@ def create_transcript(audio_source, output):
         audio = r.record(source)
 
         try:
-            g_transcript = r.recognize_google(audio)
+            g_transcript = r.recognize_google(audio, show_all=True)
             print('google:', g_transcript)
 
-            text_file = open(output, "w")
-            text_file.write(g_transcript)
-            text_file.close()
+            # text_file = open(output, "w")
+            # text_file.write(g_transcript)
+            # text_file.close()
 
         except sr.UnknownValueError:
             print("Google Speech Recognition could not understand audio")
 
         except sr.RequestError as e:
             print("Could not request results from Google Speech")
+
+        #####################################################
+
+        # try:
+        #     s_transcript = r.recognize_sphinx(audio)
+        #     print('sphinx:', s_transcript)
+        #
+        #     # text_file = open('sphinx_' + output, "w")
+        #     # text_file.write(s_transcript)
+        #     # text_file.close()
+        #
+        # except sr.RequestError as e:
+        #     print('error in sphinx recognition')
+        #     print(e)
+
+        #####################################################
+
+        # try:
+        #     b_transcript = r.recognize_bing(audio)
+        #     print('bing:', b_transcript)
+        #
+        #     # text_file = open('bing_' + output, "w")
+        #     # text_file.write(b_transcript)
+        #     # text_file.close()
+        #
+        # except sr.RequestError as e:
+        #     print('error in bing recognition')
+        #     print(e)
+
+        #####################################################
+
+        # try:
+        #     i_transcript = r.recognize_ibm(audio)
+        #     print('ibm:', i_transcript)
+        #
+        #     # text_file = open('ibm_' + output, "w")
+        #     # text_file.write(i_transcript)
+        #     # text_file.close()
+        #
+        # except sr.RequestError as e:
+        #     print('error in ibm recognition')
+        #     print(e)
+
+        #####################################################
+
+        # try:
+        #     h_transcript = r.recognize_houndify(audio)
+        #     print('houndify:', h_transcript)
+        #
+        #     # text_file = open('houndify_' + output, "w")
+        #     # text_file.write(h_transcript)
+        #     # text_file.close()
+        #
+        # except:
+        #     print('error in houndify recognition')
 
 
 directory = 'C:/Users/Maxfield/Desktop/active/jksn-2017/WA-WS/transcription_test/'
@@ -74,6 +129,6 @@ transcribe_out = 'transcribe_out.txt'
 
 #strip_audio(main_video_in, main_audio_out)
 #split_audio(directory + sub_audio_in, directory + sub_audio_out, 10)
-#create_transcript(directory + sub_audio_in, directory + transcribe_out)
+create_transcript(directory + sub_audio_in, directory + transcribe_out)
 
 # 40 minute video completed in 33 seconds

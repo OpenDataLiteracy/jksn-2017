@@ -20,4 +20,5 @@ University of Washington, Seattle Washington, USA
 - [Synthesis](full/SR-synthesis.md)
 
 ## Other Information:
+- [Consolidated Reading Notes](reading_general_notes/All-Notes-jmb.md)
 - [Sources](full/cite.md)
