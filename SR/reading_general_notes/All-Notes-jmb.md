@@ -12,6 +12,9 @@
 9. [HCI: Civic Engagement and Trust](#hci-civic-engagement-and-trust)
 10. [WikiLeaks and the Age of Transparency](#wikileaks-and-the-age-of-transparency)
 11. [Blacked Out](#blacked-out)
+12. [Information Crowdsourcing to Protect the Vulnerable](#information-crowdsourcing-to-protect-the-vulnerable)
+13. [ICTs to Create Culture of Transparency](#icts-to-create-culture-of-transparency)
+14. [Diffusion of Civic Technology in the United States](#diffusion-of-civic-technology-in-the-united-states)
 
 ## Open Government
 [Link to Book](http://shop.oreilly.com/product/9780596804367.do)
@@ -168,6 +171,39 @@ The author notes that while during wartime (specifically: war on terrorism) requ
 The author points out that FOIA is a democratic process. Depending on the current administration, FOIA may be stronger or more transparent than a previous administration, however usually, the strongest 'maelstroms of transparency' are leaks, which grow ever larger with the increased usage and dependency on information technology.
 
 In summation: the author sees the need for some restraint in transparency. However, he argues that government decision making is becoming more and more limited and closed from the public, even when technology is only encouraging more transparency.
+
+[Back to Top](#all-reading-notes-consolidated)
+
+## Information Crowdsourcing to Protect the Vulnerable
+[Link to Paper](http://www.ids.ac.uk/publication/mediating-voices-communicating-realities-using-information-crowdsourcing-tools-open-data-initiatives-and-digital-media-to-support-and-protect-the-vulnerable)
+
+Information Crowdsourcing technologies are not just for journalists and mass media. They are also becoming increasingly focused on community empowerment and engagement platforms for developing countries.
+
+Open data and mapping initiatives like OpenStreetMap are enabling citizens to generate and disseminate critical information for their lives and livelihoods. And importantly, this data and information was trusted because it was from locals that knew the events of their area.
+
+Information crowdsourcing has led to community information platforms that take advantage of ICTs. This specific paper was focused on the Map Kibera pilot project that demonstrated that communities in difficult circumstances in developing nations can be equipped with skills to harness communication tools that enable them to collect data and information and use it to present a positive image of their community to the rest of the world.
+
+[Back to Top](#all-reading-notes-consolidated)
+
+## ICTs to Create Culture of Transparency
+[Link to Paper](http://www.sciencedirect.com/science/article/pii/S0740624X10000201)
+
+ICTs have enabled increased openness and transparency in all actions. E-government has been used to build more comprehensive transparency systems in a number of governments and organizations and while there have been some changes in how we view transparency, this paper examined the effects on social change of ICTs and transparency technology.
+
+Though ICTs are disruptive, and promote stronger transparency standards, there are considerable actions that must first be overcome by cultural and social factors. One of the main focuses of this paper was on the need to develop measures of transparency, *Like what we are doing sort of*, the need to evaluate a transparency method or range. Additionally, there is emphasis on developing implementation strategies, evaluating systems for expansion, reusing technology rather than remaking, and investing in collaborative projects.
+
+*While culture and social factors may not have changed much in terms of transparency technology, there has already been a notable shift in identifying openness and stemming corrupt behavior.*
+
+[Back to Top](#all-reading-notes-consolidated)
+
+## Diffusion of Civic Technology in the United States
+[Link to Paper](http://eds.a.ebscohost.com.offcampus.lib.washington.edu/ehost/pdfviewer/pdfviewer?vid=1&sid=ec0bef6a-0167-4f59-b621-035167b055b6%40sessionmgr4007)
+
+Civic technology has opened up entirely new venues for communication between citizens but also between citizens and their governments. Generally civic technology is an array of technology and nontechnology interventions including open civic data and transparency, civic and service applications and advanced technology solutions such as municipal general-information and non-emergency service-request call centers and database-interface standards to facilitate service reporting using other types of ICT, and open and civic mapping, and lastly, organizational innovations such as civic hacking and Hackathons, Code for America fellowships, and similar arrangements.
+
+Civic tech has made it appear like a potential revolution in the way governments, community groups and nonprofits relate to each other. And while there has been considerable discussion of the relationship between sectors and how the distinctions between sectors have blurred, developments like civic tech could if bully realized radically alter that relationship.
+
+Analysis from the paper suggests that overall civic technology adoption is more strongly associated with the production of an award-winning PAFR (Popular Annual Financial Reporting) than with population size. This roughly translates to: the decision to adopt civic technology is driven more by an inclination to engage the public meaningfully than by the size of municipalities. Larger organizations are more willing to innovate and larger municipalities had higher levels of civic tech development.
 
 [Back to Top](#all-reading-notes-consolidated)
 

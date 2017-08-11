@@ -11,6 +11,8 @@ Sometimes referred to as data utility, data access is the question and idea of h
 
 4. Data Leak -- Or Data Breach, Data Leak is the first-party or third-party leak of internal information or data to an outside organization. WikiLeaks was a large document library for data leaks from the federal government's State Department and Military services. With classification between leaks as well-intentioned and nefarious. Usually, these can be easily classified by if the leaker was an internal employee vs. an outside source.
 
+(Using ICTs to create a culture of transparency, Bertot)
+
 Together, these can describe data access as a whole. It is not only the information that is available, but how that information and data was created, stored, and retrieved.
 And while these four topics can generally cover all of data access as a subject matter, it is also important to note that many technologies, while not explicitly developed as civic technologies, have been utilized as civic engagement and awareness systems. Twitter for example is used as an information crowdsourcing tool by many news organizations and one could argue that Twitter is a civic technology, but it's original development was not aimed at specifically civic tech.
 

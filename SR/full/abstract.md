@@ -34,6 +34,9 @@ civic technology, engagement technology, civic engagement, voting technology, ci
 
 Civic technologies are occasionaly described in terms of affordances (Taylor et al. 2015), such that they offer new opprotunities for "ecologies of people, practices and data forms for generating, viewing and possibly analysing data in matters of civic concern" (Balestrini et al., 2017).
 
+'An emerging set of practices that proponents assert has the potential to remake communities and local-government organizations throughout the world. Applications that allow citizens to schedule public services, communicate with neighbors and other stakeholders, and participate in government and a wide variety of other tasks, via civic practices that build upon an extensive and growing set of online applications and data.' (McNutt et al., 2016)
+
+'The use of digital technologies and social media for service provision, civic engagement, and data analysis [in ways that have] the potential to transform cities and the lives of their low income residents.' (McNutt et al. 2016)
 
 #### Transparency:
 *Need to find and generate our own definitions for transparency*

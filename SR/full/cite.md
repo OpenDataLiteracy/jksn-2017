@@ -14,6 +14,9 @@
 - HCI, Civic Engagement & Trust: http://dl.acm.org.offcampus.lib.washington.edu/citation.cfm?doid=2702123.2702255
 - Wikileaks and the Age of Transparency: http://www-tandfonline-com.offcampus.lib.washington.edu/doi/abs/10.1080/10357718.2012.681991
 - Blacked Out: Government Secrecy in the Information Age: http://www-tandfonline-com.offcampus.lib.washington.edu/doi/abs/10.1080/13876980802468972
+- Mediating Voices, Communicating Realities: Using Information Crowdsourcing Tools, Open Data Initiatives and Digital Media to Support and Protect the Vulnerable
+- Using ICTs to create a culture of transparency: E-government and social media as openness and anti-corruption tools for societies: http://www.sciencedirect.com/science/article/pii/S0740624X10000201
+- The diffusion of civic technology and open government in the United States: http://content.iospress.com/articles/information-polity/ip385
 
 ## CURRENTLY REVIEWING FULL NOTES:
 - Mossberger, Karen, et al. Digital Citizenship : The Internet, Society, and Participation, MIT Press, 2007. ProQuest Ebook Central, https://ebookcentral.proquest.com/lib/washington/detail.action?docID=3338750.
@@ -24,17 +27,21 @@
 
 ## NOT YET:
 - Cyberdemocracy: Technology, Cities, and Civic Networks
-- Mediating Voices, Communicating Realities: Using Information Crowdsourcing Tools, Open Data Initiatives and Digital Media to Support and Protect the Vulnerable
 - Civic Engagement, Pedagogy, and Information Technology on Web Sites for Youth: http://www.tandfonline.com/doi/abs/10.1080/10584600802197525
 - Sens-Us: Designing Innovative Civic Technology for the Public Good: http://dl.acm.org/citation.cfm?id=2901877
 - Children, Youth, and Civic (dis)Engagement: Digital Technology and Citizenship: https://tspace.library.utoronto.ca/handle/1807/32142
 - Civic Hackathons: Innovation, Procurement, or Civic Engagement?: http://onlinelibrary.wiley.com/doi/10.1111/ropr.12074/full
-- The diffusion of civic technology and open government in the United States: http://content.iospress.com/articles/information-polity/ip385
 - Civic open data at a crossroads: Dominant models and current challenges: http://www.sciencedirect.com/science/article/pii/S0740624X15000611
 - Open Data and Civic Apps: First-Generation Failures, Second-Generation Improvements: https://cacm.acm.org/magazines/2016/1/195725-open-data-and-civic-apps/fulltext
 - Challenges in Crowdsourcing Real-Time Information for Public Transportation: http://ieeexplore.ieee.org/abstract/document/6916878/?reload=true
 - E-Government: Evolving relationship of citizens and government, domestic, and international development: http://www.sciencedirect.com/science/article/pii/S0740624X05000936
-- Using ICTs to create a culture of transparency: E-government and social media as openness and anti-corruption tools for societies: http://www.sciencedirect.com/science/article/pii/S0740624X10000201
+- How Good is Volunteered Geographical Information? A Comparative Study of OpenStreetMap and Ordnance Survey Datasets: http://journals.sagepub.com/doi/abs/10.1068/b35097
+- From Crowd-Sourcing Potholes to Community Policing: Applying Interoperability Theory to Analyze the Expansion of 'Open311': https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2313208
+- Questioning Big Data: Crowdsourcing crisis data towards an inclusive humanitarian response: http://journals.sagepub.com/doi/abs/10.1177/2053951716662054
+- The design of civic technology: factors that influence public participation and impact: http://www.tandfonline.com/doi/abs/10.1080/00140139.2017.1349939
+- Microtasking: Redefining crowdsourcing practices in emergency management: https://search.informit.com.au/documentSummary;dn=815917622185255;res=IELHSS
+- Technology and Urban Planning: Conditions, Market, and Guidelines: http://digitalcommons.calpoly.edu/cgi/viewcontent.cgi?article=1172&context=crpsp
+- Crowdsourcing as a Knowledge-Search Method in Digital Journalism: http://www.tandfonline.com/doi/abs/10.1080/21670811.2015.1034807
 
 ## Search Terms:
 - Civic Technology
@@ -46,3 +53,4 @@
 - Civic Information Crowdsourcing
 - Government Data Leak
 - Government Data Transparency
+- "Information Crowdsourcing" Civic Technology
