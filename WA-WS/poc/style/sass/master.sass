@@ -9,7 +9,7 @@ $foam: lighten($teal, 10%)
 $soft-white: #EEE
 $mid-black: #3A3A3B
 $grey: #ADAEAF
-$mid-linen: #8C8C8C
+$grey-linen: #8C8C8C
 $red: #CB4240
 $blue: #0074C8
 $light-grey: #EEEFF0
@@ -35,9 +35,15 @@ $green: #97C33C
   margin: 10vh 20vw
   width: 60vw
 
-.events_container
+  @media (max-width: 1152px)
+    display: block
+
+#recent_events_committee_lookup
+  margin: 10px 0px 0px 0px
+
+.list_data_container
   padding: 40px
-  width: 70vw
+  width: 90%
 
 .event_container
   border: 0px solid transparent
@@ -67,6 +73,67 @@ $green: #97C33C
   height: 100%
   margin: 0px 20%
   width: 60%
+
+// DROPDOWN
+.dropdown_container
+  background-color: $soft-white
+  border: 0px solid transparent
+  border-radius: 2px
+  color: $mid-black
+  height: 36px
+  line-height: 36px
+  text-align: left
+  width: 100%
+
+  &:hover
+    background-color: $grey
+    cursor: pointer
+
+    &.drop_search_button_icon
+      background-color: $grey-linen
+      cursor: pointer
+
+  .drop_search_button_drop
+    color: $black
+    display: inline-block
+    float: right
+    height: 36px
+    text-align: center
+    width: 36px
+
+  .drop_search_button_icon
+    background-color: $grey
+    border: 0px solid transparent
+    border-radius: 2px
+    color: $black
+    display: inline-block
+    height: 36px
+    text-align: center
+    width: 36px
+
+  span
+    margin: auto auto auto 20px
+
+.dropdown_elements_container
+  background-color: $soft-white
+  border: 0px solid transparent
+  border-radius: 2px
+  border-top-left-radius: 0px
+  border-top-right-radius: 0px
+  height: 400px
+  overflow-y: scroll
+  width: 100%
+
+.dropdown_element
+  background-color: $soft-white
+  border-bottom: 1px solid $mid-black
+  font-size: 11px
+  height: 36px
+  line-height: 36px
+  padding-left: 10px
+
+  &:hover
+    background-color: $grey-linen
 
 // FONTS
 .font_standard
