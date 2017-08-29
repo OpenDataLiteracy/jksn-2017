@@ -354,7 +354,7 @@ def strip_audio(project_path, video_label, audio_label, video_in, audio_out):
     command += project_path
     command += video_label
     command += video_in
-    command += ' -ab 160k -ac 2 -ar 44100 -vn'
+    command += ' -ab 160k -ac 2 -ar 44100 -vn '
     command += project_path
     command += audio_label
     command += audio_out
