@@ -5,11 +5,14 @@ import shutil
 from bs4 import BeautifulSoup as bs
 import json
 import datetime
+import speech_recognition as sr
 from pprint import pprint
 import os
+from pydub import AudioSegment
 
 # database configuration and admin settings
-from configure_poc_storage import *
+from configure_keys import *
+
 
 # DATABASE CONNECTION
 firebase = pyrebase.initialize_app(config)
@@ -277,6 +280,55 @@ def get_stored_data(path, return_data=False):
     else:
         return focus.get()
 
+def generate_transcript_from_audio(project_directory, audio_directory, output_directory, naming_function, delete_audio=False, prints=True):
+    # use the audio file as the audio source
+    project_directory = check_path_safety(project_directory)
+    audio_directory = check_path_safety(audio_directory)
+    output_directory = check_path_safety(output_directory)
+
+    r = sr.Recognizer()
+
+    # get the current working directory for comparison
+    cwd = os.getcwd()
+
+    # check if the path is in the current working directory
+    if audio_directory not in cwd:
+
+        # update the directory to match path
+        os.chdir(project_directory + audio_directory)
+
+    transcript = ''
+
+    splits = os.listdir()
+
+    for i in range(len(splits)):
+
+        print(project_directory + audio_directory + str(i) + '.wav')
+
+        with sr.AudioFile(project_directory + audio_directory + str(i) + '.wav') as source:
+            #reads the audio file. Here we use record instead of
+            #listen
+            audio = r.record(source)
+
+            try:
+                g_transcript = r.recognize_google(audio)
+                transcript += ' ' + g_transcript
+
+            except sr.UnknownValueError as e:
+                print('Google Speech Recognition could not understand audio...', e)
+
+            except sr.RequestError as e:
+                return 'Could not request results from Google Speech...', e
+
+    if not os.path.exists(project_directory + output_directory):
+        os.mkdir(project_directory + output_directory)
+
+    out_file = open(project_directory + output_directory + name_transcription(audio_directory[:-1]) , "w")
+    out_file.write(transcript[1:])
+    out_file.close()
+
+    return transcript[1:]
+
 # DATA CLEANING
 
 # clean_events_data for an event item
@@ -333,6 +385,9 @@ def rename_video_files(video_dir, cleaning_func):
 
 # check_path_safety to ensure paths end with '/'
 def check_path_safety(path):
+    if '/' == path[:1]:
+        path = path[1:]
+
     if '/' != path[-1:]:
         path += '/'
 
@@ -343,39 +398,39 @@ def video_to_audio_rename(video_in):
     return video_in[:-4] + '.wav'
 
 # strip_audio using subprocess to run ffmpeg
-# project_path: the overarching project directory, check_path_safety
+# project_directory: the overarching project directory, check_path_safety
 # video_label: the specific video directory to get, check_path_safety
 # audio_label: the specific audio directory to store, check_path_safety
 # video_in: the specific video file to get
 # audio_out: the specific audio file to store
-def strip_audio(project_path, video_label, audio_label, video_in, audio_out):
+def strip_audio(project_directory, video_label, audio_label, video_in, audio_out):
     command = 'ffmpeg -i '
 
-    command += project_path
+    command += project_directory
     command += video_label
     command += video_in
     command += ' -ab 160k -ac 2 -ar 44100 -vn '
-    command += project_path
+    command += project_directory
     command += audio_label
     command += audio_out
 
     subprocess.call(command, shell=True)
 
 # strip_audio_from_directory for given directory and labels
-# project_path: the overarching project directory, check_path_safety
+# project_directory: the overarching project directory, check_path_safety
 # video_label: the specific video directory to get, check_path_safety
 # audio_label: the specific audio directory to store, check_path_safety
 # naming_function: a function to construct a name for the output video_file
 # delete_video: boolean value to decide if you want to keep the video portion or discard after audio construction
-def strip_audio_from_directory(project_path, video_label, audio_label, naming_function, delete_video=False, prints=True):
+def strip_audio_from_directory(project_directory, video_label, audio_label, naming_function, delete_video=False, prints=True):
 
     # check_path_safety for all path variables
-    project_path = check_path_safety(project_path)
+    project_directory = check_path_safety(project_directory)
     video_label = check_path_safety(video_label)
     audio_label = check_path_safety(audio_label)
 
     # set working directory to the video_dir
-    os.chdir(project_path + video_label)
+    os.chdir(project_directory + video_label)
 
     if prints:
         print('set cwd to:', os.getcwd)
@@ -387,15 +442,48 @@ def strip_audio_from_directory(project_path, video_label, audio_label, naming_fu
         audio_out_label = naming_function(video_file)
 
         if prints:
-            print('stripping audio using:', project_path, video_label, audio_label, video_file, audio_out_label)
+            print('stripping audio using:', project_directory, video_label, audio_label, video_file, audio_out_label)
 
         # strip the audio
-        strip_audio(project_path, video_label, audio_label, video_file, audio_out_label)
+        strip_audio(project_directory, video_label, audio_label, video_file, audio_out_label)
 
         # check if to delete
         if delete_video:
-            os.remove(project_path + video_label + video_file)
+            os.remove(project_directory + video_label + video_file)
 
+def split_audio_into_parts(project_directory, audio_path, naming_function, split_length=18000, splits_directory='audio_splits/', delete_original=False, prints=True):
+    project_directory = check_path_safety(project_directory)
+    splits_directory = check_path_safety(splits_directory)
+
+    if not os.path.exists(project_directory + splits_directory):
+        os.mkdir(project_directory + splits_directory)
+
+    audio_as_segment = AudioSegment.from_wav(project_directory + audio_path)
+
+    audio_segments = [audio_as_segment[i:i+split_length] for i in range(0, len(audio_as_segment), split_length)]
+
+    subfolder = check_path_safety(splits_directory + audio_path[:-4])
+
+    split_names = name_audio_splits(project_directory=project_directory, output_directory=subfolder, audio_path=audio_path, audio_splits=audio_segments)
+
+    os.mkdir(project_directory + subfolder)
+
+    for output_path, split in split_names.items():
+        split.export(output_path, format='wav')
+
+    if delete_original:
+        os.remove(project_directory + audio_path)
+
+def name_audio_splits(project_directory, output_directory, audio_path, audio_splits):
+    split_names = dict()
+
+    for i in range(len(audio_splits)):
+        split_names[project_directory + output_directory + str(i) + '.wav'] = audio_splits[i]
+
+    return split_names
+
+def name_transcription(audio_label):
+    return audio_label + '.txt'
 
 # VARIABLES AND OBJECTS
 
@@ -436,8 +524,17 @@ video_routes = {
 #         body_events = get_test_data('http://webapi.legistar.com/v1/seattle/EventDates/' + str(item['BodyId']) + '?FutureDatesOnly=true', prints=False)
 #         print(item['BodyName'], body_events)
 
-project_path = 'C:/Users/Maxfield/Desktop/active/jksn-2017/WA-WS/poc/python'
-video_label = 'video/'
-audio_label = 'audio'
+# project_directory = 'C:/Users/Maxfield/Desktop/active/jksn-2017/WA-WS/poc/python'
+# video_label = 'video/'
+# audio_label = 'audio'
+#
+# strip_audio_from_directory(project_directory, video_label, audio_label, video_to_audio_rename, delete_video=True)
 
-strip_audio_from_directory(project_path, video_label, audio_label, video_to_audio_rename, delete_video=True)
+higher_p_path = 'C:/Users/Maxfield/Desktop/active/jksn-2017/CityOfSeattle-PoC/poc/python/audio/'
+p_path = 'C:/Users/Maxfield/Desktop/active/jksn-2017/CityOfSeattle-PoC/poc/python/audio/audio_splits/'
+a_dir = 'transportation_061112V/'
+a_path = 'transportation_112111V.wav'
+t_path = 'transcripts/'
+
+split_audio_into_parts(project_directory=higher_p_path, audio_path=a_path, naming_function=name_audio_splits)
+print(generate_transcript_from_audio(project_directory=p_path, audio_directory=a_dir, output_directory=t_path, naming_function=name_transcription))
