@@ -1,4 +1,4 @@
-import pyrebase
+#import pyrebase
 import requests
 import subprocess
 import shutil
@@ -15,10 +15,33 @@ from configure_keys import *
 
 
 # DATABASE CONNECTION
-firebase = pyrebase.initialize_app(config)
-db = firebase.database()
+# firebase = pyrebase.initialize_app(config)
+# db = firebase.database()
 
-# DATA GRABBING
+# LEGISTAR
+
+# clean_events_data for an event item
+# item must contain:
+#   EventLocation: the location of where the event took place
+def clean_events_data(item):
+
+    # create a storage time attribute
+    current_dt = datetime.datetime.now()
+    item['EventStoredDatetime'] = str(current_dt)
+
+    # reconstruct the EventLocation attribute
+    item['EventLocation'] = item['EventLocation'].replace('\r', '').replace('\n', ', ')
+
+    return item
+
+# clean_bodies_data for a body item
+def clean_bodies_data(item):
+
+    # create a storage time attribute
+    current_dt = datetime.datetime.now()
+    item['BodyStoredDatetime'] = str(current_dt)
+
+    return item
 
 # get_all_data for a dictionary of packed routes
 #   packed_route must contain:
@@ -88,6 +111,51 @@ def get_test_data(url, prints=True):
 
     # return json for manipulation
     return r
+
+# TRANSCRIPTION
+
+# clean_video_filename for a video file
+def clean_video_filename(item):
+
+    # check filename for spaces:
+    if ' ' in item:
+
+        # replace the spaces with underscore
+        item = item.replace(' ', '_')
+
+    return item
+
+# rename_video_files for an os location
+# video_dir: path in os to video files
+# cleaning_func: the cleaning function to repair or fix filenames
+def rename_video_files(video_dir, cleaning_func):
+
+    # get the current working directory for comparison
+    cwd = os.getcwd()
+
+    # check if the path is in the current working directory
+    if video_dir not in cwd:
+
+        # update the directory to match path
+        os.chdir(video_dir)
+
+    # for each file run the cleaning_func
+    for filename in os.listdir():
+        os.rename(filename, clean_video_filename(filename))
+
+# check_path_safety to ensure paths end with '/'
+def check_path_safety(path):
+    if '/' == path[:1]:
+        path = path[1:]
+
+    if '/' != path[-1:]:
+        path += '/'
+
+    return path
+
+# video_to_audio_rename with '.wav'
+def video_to_audio_rename(video_in):
+    return video_in[:-4] + '.wav'
 
 # get_video_feeds for a dictionary of packed routes
 #   packed_route must contain:
@@ -225,6 +293,266 @@ def get_video_sources(objects, path, prints=True):
             print('completed collection for:', label)
             print('-----------------------------------------------------------')
 
+# strip_audio using subprocess to run ffmpeg
+# project_directory: the overarching project directory, check_path_safety
+# video_label: the specific video directory to get, check_path_safety
+# audio_label: the specific audio directory to store, check_path_safety
+# video_in: the specific video file to get
+# audio_out: the specific audio file to store
+def strip_audio(project_directory, video_label, audio_label, video_in, audio_out):
+    command = 'ffmpeg -i '
+
+    command += project_directory
+    command += video_label
+    command += video_in
+    command += ' -ab 160k -ac 2 -ar 44100 -vn '
+    command += project_directory
+    command += audio_label
+    command += audio_out
+
+    subprocess.call(command, shell=True)
+
+# strip_audio_from_directory for given directory and labels
+# project_directory: the overarching project directory, check_path_safety
+# video_label: the specific video directory to get, check_path_safety
+# audio_label: the specific audio directory to store, check_path_safety
+# naming_function: a function to construct a name for the output video_file
+# delete_video: boolean value to decide if you want to keep the video portion or discard after audio construction
+def strip_audio_from_directory(project_directory, video_label, audio_label, naming_function, delete_video=False, prints=True):
+
+    # check_path_safety for all path variables
+    project_directory = check_path_safety(project_directory)
+    video_label = check_path_safety(video_label)
+    audio_label = check_path_safety(audio_label)
+
+    # set working directory to the video_dir
+    os.chdir(project_directory + video_label)
+
+    if prints:
+        print('set cwd to:', os.getcwd)
+
+    # for each video in the found directory
+    for video_file in os.listdir():
+
+        # construct the audio file name
+        audio_out_label = naming_function(video_file)
+
+        if prints:
+            print('stripping audio using:', project_directory, video_label, audio_label, video_file, audio_out_label)
+
+        # strip the audio
+        strip_audio(project_directory, video_label, audio_label, video_file, audio_out_label)
+
+        # check if to delete
+        if delete_video:
+            os.remove(project_directory + video_label + video_file)
+
+# name_audio_splits for a project_directory, a targetted output_directory, and a list of audio_splits
+def name_audio_splits(project_directory, output_directory, audio_splits):
+
+    # create empty dict for labels and associated split files
+    split_names = dict()
+
+    # simple name by index value
+    for i in range(len(audio_splits)):
+        split_names[project_directory + output_directory + str(i) + '.wav'] = audio_splits[i]
+
+    # return dict
+    return split_names
+
+# split_audio_into_parts for an overarching project_directory and a targetted audio file
+def split_audio_into_parts(project_directory, audio_file, naming_function=name_audio_splits, split_length=18000, splits_directory='transcripts/', prints=True):
+
+    # check_path_safety for all pathing variables
+    project_directory = check_path_safety(project_directory)
+    splits_directory = check_path_safety(splits_directory)
+
+    # create the subfolder label for checking and future storage
+    subfolder = check_path_safety(splits_directory + audio_file[:-4])
+
+    # ensure the splits directory exists
+    if not os.path.exists(project_directory + splits_directory):
+        os.mkdir(project_directory + splits_directory)
+
+    # create the specific store_directory for checking and future storage
+    store_directory = check_path_safety(project_directory + subfolder)
+
+    if prints:
+        print('creating audio splits for:\t', project_directory + audio_file)
+
+    # check if the splits already exist
+    if os.path.exists(store_directory):
+
+        # they existed, return the store_directory path
+        return store_directory
+
+    # create an AudioSegment from full audio file
+    audio_as_segment = AudioSegment.from_wav(project_directory + audio_file)
+
+    if prints:
+        print('audio was stored as segment...')
+
+    # create the list of smaller audio segments according to split_length
+    audio_segments = [audio_as_segment[i:i+split_length] for i in range(0, len(audio_as_segment), split_length)]
+
+    if prints:
+        print('audio splits created successfully...')
+
+    # combine the audio segments with their naming conventions, for now, this is forced
+    split_names = name_audio_splits(project_directory=project_directory, output_directory=subfolder, audio_splits=audio_segments)
+
+    if prints:
+        print('audio splits assigned names based off of', str(naming_function) + '...')
+
+    # create the storage directory
+    os.mkdir(store_directory)
+
+    # store each split AudioSegment under its associated label
+    for output_path, split in split_names.items():
+        split.export(output_path, format='wav')
+
+        if prints:
+            print('stored audio split', output_path + '...')
+
+    if prints:
+        print('created audio splits for:\t', audio_file, '\t||\t', store_directory)
+        print('-------------------------------------------------------')
+
+    # return the store_directory path
+    return store_directory
+
+# name_transcription simple switch to file
+def name_transcription(audio_label):
+    return audio_label[:-1] + '.txt'
+
+#generate_transcript_from_audio_splits for a directory of audio files each less than 18 seconds in length
+def generate_transcript_from_audio_splits(audio_directory, naming_function, prints=True):
+
+    # check_path_safety for audio splits directory
+    audio_directory = check_path_safety(audio_directory)
+
+    # construct a transcribed_name for checking and future processing
+    transcribed_name = name_transcription(audio_directory)
+
+    # check if the transcription already exists
+    if os.path.exists(transcribed_name):
+
+        # open the file and return the transcription
+        with open(transcribed_name, 'r') as transcript_file:
+            transcript = transcript_file.read()
+
+            if prints:
+                print('transcript for:\t', transcribed_name, 'already exists\t||\t',  transcript[:20] + '...')
+                print('---------------------------------------------------------------------------')
+
+        return transcript
+
+    if prints:
+        print('starting transcription from audio splits in:\t', audio_directory)
+
+    # no file found, start transcription engine
+    r = sr.Recognizer()
+
+    # ensure the current working directory is the audio_directory
+    os.chdir(audio_directory)
+
+    # start transcription string
+    transcript = ''
+
+    # find audio splits
+    splits = os.listdir()
+
+    if prints:
+        print('found', len(splits), 'splits in directory to transcribe from...')
+
+    # for each split (assuming standard splits naming)
+    for i in range(len(splits)):
+
+        # follow google transcription engine process
+        with sr.AudioFile(audio_directory + str(i) + '.wav') as source:
+
+            # record audio
+            audio = r.record(source)
+
+            try:
+
+                # try to transcribe the recording
+                g_transcript = r.recognize_google(audio)
+
+                # add successful transcription to cumulative transcript
+                transcript += ' ' + g_transcript
+
+            # no reason to stop transcription process with UVE, but alert user of error
+            except sr.UnknownValueError as e:
+                print('Google Speech Recognition could not understand audio...', e)
+
+            # major error, stop the engine and return
+            except sr.RequestError as e:
+                return 'Could not request results from Google Speech...', e
+
+            if prints:
+                print('transcribed:\t', audio_directory + str(i) + '.wav')
+
+    # transcription fence post fix
+    transcript = transcript[1:]
+
+    # create and store the transcription in a file
+    out_file = open(transcribed_name , "w")
+    out_file.write(transcript)
+    out_file.close()
+
+    if prints:
+        print('stored transcription at:\t', transcribed_name)
+
+    if prints:
+        print('created transcript for:\t', transcribed_name, '\t||\t',  transcript[20:] + '...')
+        print('---------------------------------------------------------------------------')
+
+    # return the transcript string
+    return transcript
+
+# generate_transcripts_for_directory for a directory of audio files
+def generate_transcripts_for_directory(project_directory, transcript_naming_function=name_transcription, delete_originals=False, delete_splits=False, prints=True):
+
+    # check_path_safety for project
+    project_directory = check_path_safety(project_directory)
+
+    # after check, set the directory to match
+    os.chdir(project_directory)
+
+    if prints:
+        print('starting work for', project_directory, '...')
+        print('-------------------------------------------------------')
+
+    # for all .wav files create audio splits and generate transcript
+    for filename in os.listdir():
+
+        # ensure file is valid for transcription process
+        if '.wav' in filename:
+
+            # create audio splits and save the splits directory for use in processing transcript
+            split_audio_dir = split_audio_into_parts(project_directory=project_directory, audio_file=filename, prints=prints)
+
+            # create the transcript from the audio split directory
+            transcript = generate_transcript_from_audio_splits(audio_directory=split_audio_dir, naming_function=transcript_naming_function, prints=prints)
+
+            # if delete_splits:
+            #     os.remove(split_audio_dir)
+            #
+            #     if prints:
+            #         print('delete_splits marked true, deleted audio splits for:\t', filename)
+            #
+            # if delete_originals:
+            #     os.remove(project_directory + filename)
+            #
+            #     if prints:
+            #         print('delete_originals marked true, deleted original audio for:\t', filename)
+
+    if prints:
+        print('completed transcript generation for all files in', project_directory)
+
+# DATA GRABBING
+
 # get_local_data for a dictionary of packed_routes
 #   packed_route must contain:
 #       path:           this will be the overarching body for the database or included in the filename
@@ -280,210 +608,6 @@ def get_stored_data(path, return_data=False):
     else:
         return focus.get()
 
-def generate_transcript_from_audio(project_directory, audio_directory, output_directory, naming_function, delete_audio=False, prints=True):
-    # use the audio file as the audio source
-    project_directory = check_path_safety(project_directory)
-    audio_directory = check_path_safety(audio_directory)
-    output_directory = check_path_safety(output_directory)
-
-    r = sr.Recognizer()
-
-    # get the current working directory for comparison
-    cwd = os.getcwd()
-
-    # check if the path is in the current working directory
-    if audio_directory not in cwd:
-
-        # update the directory to match path
-        os.chdir(project_directory + audio_directory)
-
-    transcript = ''
-
-    splits = os.listdir()
-
-    for i in range(len(splits)):
-
-        print(project_directory + audio_directory + str(i) + '.wav')
-
-        with sr.AudioFile(project_directory + audio_directory + str(i) + '.wav') as source:
-            #reads the audio file. Here we use record instead of
-            #listen
-            audio = r.record(source)
-
-            try:
-                g_transcript = r.recognize_google(audio)
-                transcript += ' ' + g_transcript
-
-            except sr.UnknownValueError as e:
-                print('Google Speech Recognition could not understand audio...', e)
-
-            except sr.RequestError as e:
-                return 'Could not request results from Google Speech...', e
-
-    if not os.path.exists(project_directory + output_directory):
-        os.mkdir(project_directory + output_directory)
-
-    out_file = open(project_directory + output_directory + name_transcription(audio_directory[:-1]) , "w")
-    out_file.write(transcript[1:])
-    out_file.close()
-
-    return transcript[1:]
-
-# DATA CLEANING
-
-# clean_events_data for an event item
-# item must contain:
-#   EventLocation: the location of where the event took place
-def clean_events_data(item):
-
-    # create a storage time attribute
-    current_dt = datetime.datetime.now()
-    item['EventStoredDatetime'] = str(current_dt)
-
-    # reconstruct the EventLocation attribute
-    item['EventLocation'] = item['EventLocation'].replace('\r', '').replace('\n', ', ')
-
-    return item
-
-# clean_bodies_data for a body item
-def clean_bodies_data(item):
-
-    # create a storage time attribute
-    current_dt = datetime.datetime.now()
-    item['BodyStoredDatetime'] = str(current_dt)
-
-    return item
-
-# clean_video_filename for a video file
-def clean_video_filename(item):
-
-    # check filename for spaces:
-    if ' ' in item:
-
-        # replace the spaces with underscore
-        item = item.replace(' ', '_')
-
-    return item
-
-# rename_video_files for an os location
-# video_dir: path in os to video files
-# cleaning_func: the cleaning function to repair or fix filenames
-def rename_video_files(video_dir, cleaning_func):
-
-    # get the current working directory for comparison
-    cwd = os.getcwd()
-
-    # check if the path is in the current working directory
-    if video_dir not in cwd:
-
-        # update the directory to match path
-        os.chdir(video_dir)
-
-    # for each file run the cleaning_func
-    for filename in os.listdir():
-        os.rename(filename, clean_video_filename(filename))
-
-# check_path_safety to ensure paths end with '/'
-def check_path_safety(path):
-    if '/' == path[:1]:
-        path = path[1:]
-
-    if '/' != path[-1:]:
-        path += '/'
-
-    return path
-
-# video_to_audio_rename with '.wav'
-def video_to_audio_rename(video_in):
-    return video_in[:-4] + '.wav'
-
-# strip_audio using subprocess to run ffmpeg
-# project_directory: the overarching project directory, check_path_safety
-# video_label: the specific video directory to get, check_path_safety
-# audio_label: the specific audio directory to store, check_path_safety
-# video_in: the specific video file to get
-# audio_out: the specific audio file to store
-def strip_audio(project_directory, video_label, audio_label, video_in, audio_out):
-    command = 'ffmpeg -i '
-
-    command += project_directory
-    command += video_label
-    command += video_in
-    command += ' -ab 160k -ac 2 -ar 44100 -vn '
-    command += project_directory
-    command += audio_label
-    command += audio_out
-
-    subprocess.call(command, shell=True)
-
-# strip_audio_from_directory for given directory and labels
-# project_directory: the overarching project directory, check_path_safety
-# video_label: the specific video directory to get, check_path_safety
-# audio_label: the specific audio directory to store, check_path_safety
-# naming_function: a function to construct a name for the output video_file
-# delete_video: boolean value to decide if you want to keep the video portion or discard after audio construction
-def strip_audio_from_directory(project_directory, video_label, audio_label, naming_function, delete_video=False, prints=True):
-
-    # check_path_safety for all path variables
-    project_directory = check_path_safety(project_directory)
-    video_label = check_path_safety(video_label)
-    audio_label = check_path_safety(audio_label)
-
-    # set working directory to the video_dir
-    os.chdir(project_directory + video_label)
-
-    if prints:
-        print('set cwd to:', os.getcwd)
-
-    # for each video in the found directory
-    for video_file in os.listdir():
-
-        # construct the audio file name
-        audio_out_label = naming_function(video_file)
-
-        if prints:
-            print('stripping audio using:', project_directory, video_label, audio_label, video_file, audio_out_label)
-
-        # strip the audio
-        strip_audio(project_directory, video_label, audio_label, video_file, audio_out_label)
-
-        # check if to delete
-        if delete_video:
-            os.remove(project_directory + video_label + video_file)
-
-def split_audio_into_parts(project_directory, audio_path, naming_function, split_length=18000, splits_directory='audio_splits/', delete_original=False, prints=True):
-    project_directory = check_path_safety(project_directory)
-    splits_directory = check_path_safety(splits_directory)
-
-    if not os.path.exists(project_directory + splits_directory):
-        os.mkdir(project_directory + splits_directory)
-
-    audio_as_segment = AudioSegment.from_wav(project_directory + audio_path)
-
-    audio_segments = [audio_as_segment[i:i+split_length] for i in range(0, len(audio_as_segment), split_length)]
-
-    subfolder = check_path_safety(splits_directory + audio_path[:-4])
-
-    split_names = name_audio_splits(project_directory=project_directory, output_directory=subfolder, audio_path=audio_path, audio_splits=audio_segments)
-
-    os.mkdir(project_directory + subfolder)
-
-    for output_path, split in split_names.items():
-        split.export(output_path, format='wav')
-
-    if delete_original:
-        os.remove(project_directory + audio_path)
-
-def name_audio_splits(project_directory, output_directory, audio_path, audio_splits):
-    split_names = dict()
-
-    for i in range(len(audio_splits)):
-        split_names[project_directory + output_directory + str(i) + '.wav'] = audio_splits[i]
-
-    return split_names
-
-def name_transcription(audio_label):
-    return audio_label + '.txt'
 
 # VARIABLES AND OBJECTS
 
@@ -524,17 +648,6 @@ video_routes = {
 #         body_events = get_test_data('http://webapi.legistar.com/v1/seattle/EventDates/' + str(item['BodyId']) + '?FutureDatesOnly=true', prints=False)
 #         print(item['BodyName'], body_events)
 
-# project_directory = 'C:/Users/Maxfield/Desktop/active/jksn-2017/WA-WS/poc/python'
-# video_label = 'video/'
-# audio_label = 'audio'
-#
-# strip_audio_from_directory(project_directory, video_label, audio_label, video_to_audio_rename, delete_video=True)
+audio_path = 'D:/Audio'
 
-higher_p_path = 'C:/Users/Maxfield/Desktop/active/jksn-2017/CityOfSeattle-PoC/poc/python/audio/'
-p_path = 'C:/Users/Maxfield/Desktop/active/jksn-2017/CityOfSeattle-PoC/poc/python/audio/audio_splits/'
-a_dir = 'transportation_061112V/'
-a_path = 'transportation_112111V.wav'
-t_path = 'transcripts/'
-
-split_audio_into_parts(project_directory=higher_p_path, audio_path=a_path, naming_function=name_audio_splits)
-print(generate_transcript_from_audio(project_directory=p_path, audio_directory=a_dir, output_directory=t_path, naming_function=name_transcription))
+generate_transcripts_for_directory(project_directory=audio_path)

@@ -35,9 +35,9 @@ Current Development Items are marked in **_bolded italics_**
 
 - [Planning for Development](#project-planning) *- complete*
    - Initial baseline development choices
-   - Establishment of stretch goals
    - Parse data and understand what is available
    - Testing and rough development
+   - Establishment of stretch goals
    - Mockups and design, database and frontend
 
 - [Development Work](#current-work)
@@ -193,7 +193,7 @@ Examples include:
 Frameworks, libraries, and more that are being used by this project with explanations on how to used them and why they were selected to be used.
 
 ### legistar
-Legistar is a system developed by [Granicus](https://granicus.com/) that enables storage and manipulation of public sector data. A large part of the legistar system is that it allows for building and tailoring you own version of the service to each organization's needs. It is also incredibly robust in terms of scalability and data availability. 
+Legistar is a system developed by [Granicus](https://granicus.com/) that enables storage and manipulation of public sector data. A large part of the legistar system is that it allows for building and tailoring you own version of the service to each organization's needs. It is also incredibly robust in terms of scalability and data availability.
 
 ### scraping
 
