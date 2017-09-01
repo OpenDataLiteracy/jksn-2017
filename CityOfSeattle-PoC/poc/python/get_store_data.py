@@ -674,4 +674,4 @@ video_routes = {
 
 audio_path = 'D:/Audio'
 
-generate_transcripts_for_directory(project_directory=audio_path)
+generate_transcripts_for_directory(project_directory=audio_path, delete_splits=True)

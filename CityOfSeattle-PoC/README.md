@@ -59,7 +59,7 @@ Current Development Items are marked in **_bolded italics_**
          - Audio file splitter created
          - Rebuild as reusable system
 
-      - [Transcription Engine](#speech-recognition) *- complete*
+      - [Transcription Engine](#speech-recognition) *- complete, note: add file deletion options*
          - Test run of system
          - Understand process, errors, limitations
          - Scale to larger files
@@ -200,9 +200,20 @@ Examples include:
 Frameworks, libraries, and more that are being used by this project with explanations on how to used them and why they were selected to be used.
 
 ### Legistar
-Legistar is a system developed by [Granicus](https://granicus.com/) that enables storage and manipulation of public sector data. A large part of the Legistar system is that it allows for building and tailoring you own version of the service to each organization's needs. It is also incredibly robust in terms of scalability and data availability.
+Legistar is a system developed by [Granicus](https://granicus.com/) that enables storage and manipulation of public sector data. A large part of the Legistar system is that it allows for building and tailoring you own version of the service to each organization's needs. It is also incredibly robust in terms of scalability and data availability. [Link to the API methods available](http://webapi.legistar.com/help)
+
+The main chunk of information I am pulling from the City of Seattle's Legistar API is the Events data. I utilize other API sections, bodies, bodytypes, etc., but it they are all used in order to help the Events data merging down the line.
+
+Technically, I have created a system to pull any data from a Legistar system and format it for use with the other systems I am building by asking for a list of, what I am calling packed_route's. This is just an object that's key is the path for storage, either locally or in a NoSQL database, and the list attached to the key is the Legistar API URL (example: [http://webapi.legistar.com/v1/seattle/Events](http://webapi.legistar.com/v1/seattle/Events')), a targeting attribute to specify an individual element (example: 'EventID'), and a data cleaning_function. The cleaning function is user created but allows for a much more scalable system, instead of forcing the user into my own methods and functions, I allow them to change and manipulate each single entity returned from the call how they like and then return the completed entity.
+
+There is one additional parameter that should be addressed, the toLocal boolean parameter for the function acts as a way to stop the storage to a database and instead save a json file to your working directory. Originally implemented to save on storage cost, I realized this actually incredibly beneficial for later combining all the data together and then storing it in a single database put.
+
+There is still some work to be done in my opinion. There can be improvements made in routing, and handling of data, however, for now, I believe this is a large improvement to developing with Legistar systems than previous build from the ground up methods.
 
 ### scraping
+Initially, I figured there would be transcripts available for all the meetings, usually called 'meeting minutes,' and while I am sure they may be tucked away somewhere in the databases of the City of Seattle. It posed an interesting problem to tackle. How to create a transcript from what was available. While the Legistar system had a plethora of Events data in their system, meeting minutes were not available, however in a separate Legistar system, videos were collected and had proper links. I could not find a solution to how to pull en masse the City Council meetings recordings however.
+
+I asked for an API link, and searched the other Legistar services, was even pointed in the direction of an associated RSS feed, however none really suited the problem I was facing of trying to store their videos for future processing.
 
 ### ffmpeg
 
@@ -219,6 +230,9 @@ Legistar is a system developed by [Granicus](https://granicus.com/) that enables
 
 ## Comments
 
+Is it possible to make it so that python script is auto running and scrapes the videos pages every so often, on a new video detected, it downloads the associated event data, and processes the transcript, and then deletes the video from the local while storing everything else?
+
+This would save on storage costs and processing time if I am not mistaken...
 
 [Back to Tools](#tools)
 
