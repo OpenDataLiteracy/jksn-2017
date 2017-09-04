@@ -6,9 +6,12 @@ from bs4 import BeautifulSoup as bs
 import json
 import datetime
 import speech_recognition as sr
+import re
 from pprint import pprint
 import os
 from pydub import AudioSegment
+import math
+import operator
 
 # database configuration and admin settings
 from configure_keys import *
@@ -536,7 +539,7 @@ def generate_transcript_from_audio_splits(audio_directory, naming_function, prin
     return transcript
 
 # generate_transcripts_for_directory for a directory of audio files
-def generate_transcripts_for_directory(project_directory, transcript_naming_function=name_transcription, delete_originals=False, delete_splits=False, prints=True):
+def generate_transcripts_from_directory(project_directory, transcript_naming_function=name_transcription, delete_originals=False, delete_splits=False, prints=True):
 
     # check_path_safety for project
     project_directory = check_path_safety(project_directory)
@@ -574,6 +577,122 @@ def generate_transcripts_for_directory(project_directory, transcript_naming_func
 
     if prints:
         print('completed transcript generation for all files in', project_directory)
+
+# RELEVANCY
+
+# generate_all_keywords
+
+def generate_words_from_doc(document, prints=True):
+    results = dict()
+    results['tf'] = dict()
+
+    with open(document) as transcript_file:
+        transcript = transcript_file.read()
+
+    words = re.sub('[_-]', ' ', transcript).split()
+
+    for word in words:
+        word = re.sub('[!@#$]', '', word)
+
+        word = word.replace('/', ' over ')
+        word = word.replace('.', ' point ')
+
+        try:
+            results['tf'][word] += 1
+        except:
+            results['tf'][word] = 1
+
+    results['length'] = float(len(words))
+
+    for word, count in results['tf'].items():
+        results['tf'][word] = float(count) / results['length']
+
+    return results
+
+def generate_tfidf_from_directory(project_directory, output_file, prints=True):
+
+    # check_path_safety for project
+    project_directory = check_path_safety(project_directory)
+
+    # after check, set the directory to match
+    os.chdir(project_directory)
+
+    if prints:
+        print('starting work for', project_directory, '...')
+        print('-------------------------------------------------------')
+
+    results = dict()
+
+    results['words'] = dict()
+    results['transcripts'] = dict()
+
+    transcript_counter = 0
+
+    # for all .wav files create audio splits and generate transcript
+    for filename in os.listdir():
+
+        # ensure file is valid for transcription process
+        if '.txt' in filename:
+
+            transcript_counter += 1
+
+            file_results = generate_words_from_doc(document=project_directory+filename, prints=prints)
+
+            for key, data in file_results.items():
+                if key == 'tf':
+
+                    for word, score in data.items():
+
+                        try:
+                            results['words'][word] += 1
+                        except:
+                            results['words'][word] = 1
+
+            results['transcripts'][filename[:-4]] = file_results
+
+    results['corpus'] = float(transcript_counter)
+
+    for transcript, data in results['transcripts'].items():
+        temp_data_hold = dict(data)
+
+        data['tfidf'] = dict()
+
+        for word, score in temp_data_hold['tf'].items():
+                # print('transcript:', transcript, '\tword:', word, '\ttf score:', score, '\n\toccurances:', score * data['length'], '\tlength:', data['length'])
+
+                data['tfidf'][word] = float(score) * math.log(results['corpus'] / float(results['words'][word]))
+
+    with open(output_file, 'w', encoding='utf-8') as outfile:
+        json.dump(results, outfile)
+
+    return results
+
+def predict_relevancy(search, tfidf_store, results=5, prints=True):
+
+    # open the locally stored json
+    with open(tfidf_store) as data_file:
+        tfidf_dict = json.load(data_file)
+
+    split_search = search.split()
+
+    found_dict = dict()
+
+    for search_word in split_search:
+
+        for transcript, data in tfidf_dict['transcripts'].items():
+
+            for stored_word, score in data['tfidf'].items():
+
+                if stored_word == search_word:
+
+                    try:
+                        found_dict[transcript] += score
+                    except:
+                        found_dict[transcript] = score
+
+    found_dict = sorted(found_dict.items(), key=operator.itemgetter(1), reverse=True)
+
+    return found_dict
 
 # DATA GRABBING
 
@@ -613,7 +732,7 @@ def get_local_data(packed_routes, os_path, prints=True):
 # get_stored_data
 #   path: the path from the database origin
 #   return_data: boolean true or false for if to return the actual values stored or the database object
-def get_stored_data(path, return_data=False):
+def get_stored_data(path, return_data=True):
 
     # get a focus target
     focus = db
@@ -664,7 +783,14 @@ video_routes = {
 
 # TEMPORARY AND TESTING
 
+print(predict_relevancy(search='SODO arena', tfidf_store='D:/tfidf.json'))
+
+# ABANDONED
+
 # get_future_event_dates
+#
+# not needed for searching relevancy of videos/ events/ meetings
+#
 # data = get_local( { 'bodies': all_routes['bodies'] } , prints=False)
 #
 # for key, datum in data.items():
@@ -672,6 +798,12 @@ video_routes = {
 #         body_events = get_test_data('http://webapi.legistar.com/v1/seattle/EventDates/' + str(item['BodyId']) + '?FutureDatesOnly=true', prints=False)
 #         print(item['BodyName'], body_events)
 
-audio_path = 'D:/Audio'
+# REAL RUNNING
 
-generate_transcripts_for_directory(project_directory=audio_path, delete_splits=True)
+# @RUN
+# Run for mass transcripts
+# generate_transcripts_for_directory(project_directory='D:/Audio', delete_splits=True)
+
+# @RUN
+# Run for mass tfidf
+# generate_tfidf_from_directory(project_directory='D:/Audio/transcripts', output_file='D:/tfidf.json')
