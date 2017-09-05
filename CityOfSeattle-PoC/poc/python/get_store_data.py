@@ -12,6 +12,9 @@ import os
 from pydub import AudioSegment
 import math
 import operator
+from PyDictionary import PyDictionary
+import Levenshtein
+
 
 # database configuration and admin settings
 from configure_keys import *
@@ -24,6 +27,8 @@ from configure_keys import *
 # LEGISTAR
 
 # clean_events_data for an event item
+#   item: the event unique item returned from the legistar events api
+#
 #   item must contain:
 #       EventLocation: the location of where the event took place
 def clean_events_data(item):
@@ -38,6 +43,7 @@ def clean_events_data(item):
     return item
 
 # clean_bodies_data for a body item
+#   item: the body unique item returned from legistar bodies api
 def clean_bodies_data(item):
 
     # create a storage time attribute
@@ -118,6 +124,7 @@ def get_test_data(url, prints=True):
 # TRANSCRIPTION
 
 # clean_video_filename for a video file
+#   item: the filename to be cleaned of spaces
 def clean_video_filename(item):
 
     # check filename for spaces:
@@ -147,6 +154,7 @@ def rename_video_files(video_dir, cleaning_func=clean_video_filename):
         os.rename(filename, clean_video_filename(filename))
 
 # check_path_safety to ensure paths end with '/'
+#   path: the directory path to be checked for safe endings
 def check_path_safety(path):
     if '/' == path[:1]:
         path = path[1:]
@@ -157,10 +165,13 @@ def check_path_safety(path):
     return path
 
 # video_to_audio_rename with '.wav'
+#   video_in: the path for the video file to be renamed
 def video_to_audio_rename(video_in):
     return video_in[:-4] + '.wav'
 
 # used as the default scraping_function for get_video_feeds
+#   path: the label for a general feed
+#   routes: the passed through route information
 def scrape_seattle_channel(path, routes, prints=True):
     # request the url and scrape the page to collect information
     r = requests.get(routes[0])
@@ -372,6 +383,8 @@ def strip_audio_from_directory(project_directory, video_label, audio_label, nami
             os.remove(project_directory + video_label + video_file)
 
 # name_audio_splits for a project_directory, a targetted output_directory, and a list of audio_splits
+#   project_directory: the overarching project directory path
+#   output_directory: the containing folder for where the audio_splits will result to
 def name_audio_splits(project_directory, output_directory, audio_splits):
 
     # create empty dict for labels and associated split files
@@ -385,6 +398,11 @@ def name_audio_splits(project_directory, output_directory, audio_splits):
     return split_names
 
 # split_audio_into_parts for an overarching project_directory and a targetted audio file
+#   project_directory: the overarching project directory path where the audio file is located
+#   audio_file: the specific file you want to split
+#   naming_function: a function to assign names to the audio splits, (WORK IN PROGRESS, DON'T CHANGE FROM DEFAULT)
+#   split_length: the time in ms for the length of an individual audio split
+#   splits_directory: the output directory for where all the splits folder will then be nested
 def split_audio_into_parts(project_directory, audio_file, naming_function=name_audio_splits, split_length=18000, splits_directory='transcripts/', prints=True):
 
     # check_path_safety for all pathing variables
@@ -449,11 +467,14 @@ def split_audio_into_parts(project_directory, audio_file, naming_function=name_a
     return store_directory
 
 # name_transcription simple switch to file
+#   audio_label: the current audio filename
 def name_transcription(audio_label):
     return audio_label[:-1] + '.txt'
 
 #generate_transcript_from_audio_splits for a directory of audio files each less than 18 seconds in length
-def generate_transcript_from_audio_splits(audio_directory, naming_function, prints=True):
+#   audio_directory: the directory of audio splits path you want to generate transcripts for
+#   naming_function: a naming function for labeling the generated transcripts and storing them
+def generate_transcript_from_audio_splits(audio_directory, naming_function=name_transcription, prints=True):
 
     # check_path_safety for audio splits directory
     audio_directory = check_path_safety(audio_directory)
@@ -539,6 +560,10 @@ def generate_transcript_from_audio_splits(audio_directory, naming_function, prin
     return transcript
 
 # generate_transcripts_for_directory for a directory of audio files
+#   project_directory: the directory path you want to generate transcripts for
+#   transcript_naming_function: a naming function for labeling the generated transcripts and storing them
+#   delete_originals: boolean to determine if you want to delete the original audio files once transcription is completed
+#   delete_splits: boolean to determine if you want to delete the audio split files once transcription is completed
 def generate_transcripts_from_directory(project_directory, transcript_naming_function=name_transcription, delete_originals=False, delete_splits=False, prints=True):
 
     # check_path_safety for project
@@ -580,35 +605,84 @@ def generate_transcripts_from_directory(project_directory, transcript_naming_fun
 
 # RELEVANCY
 
-# generate_all_keywords
-
+# generate_all_keywords for a document
+#   document: the direct path to the document
 def generate_words_from_doc(document, prints=True):
+
+    # initialize py-dict for synonyms
+    # dictionary = PyDictionary()
+
+    # construct results dictionary object to store all generated information
     results = dict()
+
+    # construct base term frequency dictionary object to store term frequency information
     results['tf'] = dict()
 
+    if prints:
+        print('started work on:', document, '...')
+
+    # open the transcription file and read the content
     with open(document) as transcript_file:
         transcript = transcript_file.read()
 
+    # replace any conjoining characters with spaces and split the transcription into words
     words = re.sub('[_-]', ' ', transcript).split()
 
+    if prints:
+        print('split words...')
+
+    # for each word in the transcription
     for word in words:
+
+        # get rid of any non-alphanumeric characters
         word = re.sub('[!@#$]', '', word)
 
+        # temporary fixes for transcription generated decimals and percents
         word = word.replace('/', ' over ')
         word = word.replace('.', ' point ')
 
+        # try adding to the word counter
         try:
-            results['tf'][word] += 1
-        except:
-            results['tf'][word] = 1
+            results['tf'][word]['count'] += 1
 
+        # must not have been initialized yet
+        except:
+
+            # construct the synonyms list
+            synonym_add_list = list()
+
+            # to_check_synonyms = dictionary.synonym(word)
+            #
+            # if type(to_check_synonyms) is list:
+            #     for synonym in dictionary.synonym(word):
+            #         if ' ' not in synonym_add_list:
+            #             synonym_add_list.append(synonym)
+
+            # initialize the word counter and add the synonyms
+            results['tf'][word] = {'count': 1, 'synonyms': synonym_add_list}
+
+    # store the word length of the transcription
     results['length'] = float(len(words))
 
-    for word, count in results['tf'].items():
-        results['tf'][word] = float(count) / results['length']
+    if prints:
+        print('initial pass for transcript complete')
 
+    # for each word in the generated term frequency dictionary
+    for word, data in results['tf'].items():
+
+        # compute the true term frequency
+        results['tf'][word]['score'] = float(data['count']) / results['length']
+
+    if prints:
+        print('secondary pass for transcript complete, sending completed dictionary')
+        print('---------------------------------------------------------------')
+
+    # return the completed term frequency dictionary
     return results
 
+# generate_tfidf_from_directory for a directory of transcripts
+#   project_directory: the directory path where transcripts are stored
+#   output_file: the output file path to store the final tfidf json object
 def generate_tfidf_from_directory(project_directory, output_file, prints=True):
 
     # check_path_safety for project
@@ -618,81 +692,153 @@ def generate_tfidf_from_directory(project_directory, output_file, prints=True):
     os.chdir(project_directory)
 
     if prints:
-        print('starting work for', project_directory, '...')
-        print('-------------------------------------------------------')
+        print('starting work on:', project_directory, '...')
 
+    # initialize results dictionary
     results = dict()
 
+    # initialize base dictionaries for storage of deep information
     results['words'] = dict()
     results['transcripts'] = dict()
 
     transcript_counter = 0
 
-    # for all .wav files create audio splits and generate transcript
+    # for all .txt files generate words information and calculate tfidf
     for filename in os.listdir():
 
-        # ensure file is valid for transcription process
+        # ensure file is valid for tfidf process
         if '.txt' in filename:
 
+            # increment total transcriptions counter
             transcript_counter += 1
 
+            # get words information for file
             file_results = generate_words_from_doc(document=project_directory+filename, prints=prints)
 
-            for key, data in file_results.items():
-                if key == 'tf':
+            if prints:
+                print('adding word set to corpus...')
 
-                    for word, score in data.items():
+            # get results for all words in corpus
+            for word, score in file_results['tf'].items():
 
-                        try:
-                            results['words'][word] += 1
-                        except:
-                            results['words'][word] = 1
+                # try adding to word counter
+                try:
+                    results['words'][word] += 1
 
+                # was not initialized yet
+                except:
+                    results['words'][word] = 1
+
+            # add single file results to total file results
             results['transcripts'][filename[:-4]] = file_results
 
+            if prints:
+                print('completed file:', filename, '...')
+
+    # add corpus results to total file results
     results['corpus'] = float(transcript_counter)
 
+    if prints:
+        print('starting second pass word tfidf scoring')
+
+    # for each transcript construct a tfidf dictionary to hold completed computation
     for transcript, data in results['transcripts'].items():
+
+        # deep copy
         temp_data_hold = dict(data)
 
+        # base layer for storage
         data['tfidf'] = dict()
 
+        # for each word compute tfidf score
         for word, score in temp_data_hold['tf'].items():
                 # print('transcript:', transcript, '\tword:', word, '\ttf score:', score, '\n\toccurances:', score * data['length'], '\tlength:', data['length'])
 
+                # actual computation
                 data['tfidf'][word] = float(score) * math.log(results['corpus'] / float(results['words'][word]))
 
+    if prints:
+        print('completed all files, storing and returning results for:', project_directory)
+        print('----------------------------------------------------------------------------------------')
+
+    # completed all computation, dump into output file
     with open(output_file, 'w', encoding='utf-8') as outfile:
         json.dump(results, outfile)
 
+    # return the final dictionary object
     return results
 
-def predict_relevancy(search, tfidf_store, results=5, prints=True):
+# predict_relevancy for a corpus of tfidf documents
+#   search: the word, phrase, or sentence to find in the corpus
+#   tfidf_store: the tfidf created json object's path created by generate_tfidf_from_directory
+#   edit_distance: boolean true and false allowance of similar (misspelled) search terms
+#   adjusted_distance_stop: float value to determine the cut off point of search term similarity
+#   results: number of results you want to recieve back
+def predict_relevancy(search, tfidf_store, edit_distance=True, adjusted_distance_stop = 0.42, results=10):
 
     # open the locally stored json
     with open(tfidf_store) as data_file:
         tfidf_dict = json.load(data_file)
 
+    # split the search into words
     split_search = search.split()
 
+    # initialize the found comparisons dict
     found_dict = dict()
 
+    # for each search term, construct relevancy dictionaries
     for search_word in split_search:
 
+        # for each data point and information stored in stored dictionary
         for transcript, data in tfidf_dict['transcripts'].items():
 
+            # for each word and it's score
             for stored_word, score in data['tfidf'].items():
 
+                # if the word direct matches the search term
                 if stored_word == search_word:
 
+                    # try adding the tfidf score to the relevancy score
                     try:
-                        found_dict[transcript] += score
+                        found_dict[transcript]['relevancy'] += score
+
+                        # the stored_word comparison isn't already in the found words
+                        if stored_word not in found_dict[transcript]['searched']:
+                            found_dict[transcript]['searched'].append(stored_word)
+
+                    # relevancy score needs to be initialized
                     except:
-                        found_dict[transcript] = score
+                        found_dict[transcript] = {'relevancy': score, 'searched': [stored_word]}
 
-    found_dict = sorted(found_dict.items(), key=operator.itemgetter(1), reverse=True)
+                # direct search term not found as a word
+                else:
 
-    return found_dict
+                    # check if edit distance is allowed as attribute for searching
+                    if edit_distance:
+
+                        # calculate the adjusted_distance
+                        adjusted_distance = float(Levenshtein.distance(stored_word, search_word)) / len(stored_word)
+
+                        # if the adjusted_distance isn't too large
+                        if adjusted_distance < adjusted_distance_stop:
+
+                            # try adding the adjusted_distance scored to relevancy score
+                            try:
+                                found_dict[transcript]['relevancy'] += ((0.6 - adjusted_distance) * score)
+
+                                # the stored_word comparison isn't already in the found words
+                                if stored_word not in found_dict[transcript]['searched']:
+                                    found_dict[transcript]['searched'].append(stored_word)
+
+                            # must initialize relevancy score
+                            except:
+                                found_dict[transcript] = {'relevancy': ((0.6 - adjusted_distance) * score), 'searched': [stored_word]}
+
+    # sort the found data by the relevancy score
+    found_dict = sorted(found_dict.items(), key=lambda x: x[1]['relevancy'], reverse=True)
+
+    # return the found data
+    return found_dict[:results]
 
 # DATA GRABBING
 
@@ -783,7 +929,9 @@ video_routes = {
 
 # TEMPORARY AND TESTING
 
-print(predict_relevancy(search='SODO arena', tfidf_store='D:/tfidf.json'))
+#pprint(generate_words_from_doc(document='D:/Audio/transcripts/arenas_041717V.txt'))
+
+pprint(predict_relevancy(search='asdf housing', tfidf_store='D:/tfidf.json'))
 
 # ABANDONED
 

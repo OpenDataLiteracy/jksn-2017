@@ -66,13 +66,13 @@ Current Development Items are marked in **_bolded italics_**
          - Rebuild as reusable system
 
       - [Search Engine](#tfidf)
-         - Create working concept of tfidf for a set of transcripts **_current: 31 August 2017_**
+         - Create working concept of tfidf for a set of transcripts
          - Build system to scale for larger audio files
          - Attach agenda information to scoring algorithm
          - Attach body, date, etc. information to scoring algorithm
-         - Attach synonyms and common replacements of high score attributes to scoring algorithm
+         - Attach synonyms and common replacements of high score attributes to scoring algorithm **_need to find better implementation_**
          - Create search functionality from user input
-         - Add Levenschtein Edit Distance to user input on search
+         - Add Levenschtein Edit Distance to user input on search **_current: 4 September 2017_**
          - Fix bugs and finalize search
          - Rebuild as reusable system
 
@@ -189,6 +189,8 @@ Examples include:
 - Determining or predicting a council member's position on an upcoming bill, amendment, or resolution, based off of past meetings.
 - Adding other sections of the Legistar and City Council data to the service. Specifically: creating a system for helping the public understand the current process and timeline of an event, or action awaiting decision.
 - Better scoring and ranking algorithms for searching and determining relevance of an event.
+- Adding synonym checking for searching to compare to known words and weight them
+- Adding nearby words comparison to searching
 - Scoring and ranking algorithms for other sections of City Council data.
 - Add third party data ingestion, from the Clerks office themselves, so that they can directly add information to our storage so that we don't bog down their servers with additional scraping, and API usage.
 
@@ -215,9 +217,31 @@ Initially, I figured there would be transcripts available for all the meetings, 
 
 I asked for an API link, and searched the other Legistar services, was even pointed in the direction of an associated RSS feed, however none really suited the problem I was facing of trying to store their videos for future processing.
 
+Enter, web scraping, I built a simple enough way to generate a JSON object with the required information needed to run the rest of the video transcription process, given a suitable scraping function created by the user. Again, hoping that this software will be used by other cities as a way for better City Council meeting understand, searching, and accountability, this needed to be modularized.
+
+Using a similar model as the Legistar system, the user supplies a list of packed_routes, the key still acts a path and storage identifier, this time however, the URL is linking to the page with the video sources, and a body_name is supplied which is the name of the body as it is stored in the Legistar system. This is required for matching the data later on as what I found was that Seattle would have a video body name and label but internally, they have a Legistar name and label that sometimes doesn't match.
+
+The scraping function defaults to my Seattle Channel specific scraper, but it is a simple function using BS4 and Requests to retrieve, all the video links on a page, and for each link, the source URL, the video agenda, and store the datetime of publishing.
+
+Lastly, I have a toLocal boolean again to ensure safety in processing the data and finally I returned the constructed json objects with all the completed data back.
+
 ### ffmpeg
+One of the areas I think this system also is valuable, is that it creates all different types of way to view the City Council event media. I originally planned on only returning back the transcripts for a meeting, but as a way to generate the transcripts I first needed to split the videos audio into a specific audio file.
+
+FFMPEG allows for such quickly and easily. Using subprocess and a bit of path chaining, it was easy to set up functions for splitting audio from a single file to all files in a directory.
 
 ### speech recognition
+The python speech recognition package is really what this entire project hinges on. It creates a link to the Google Speech Recognition API and generates a transcript for a portion of audio. Sounds simple enough?
+
+In reality, Google will almost never let an individual process large chunks of audio at a time, so we needed to create a system to split the audio and then transcribe each snippet and then combine all the smaller transcripts back together.
+
+To split the audio, I created a function that utilizes the AudioSegment package, and from there you can do simple list slicing on Audio to create smaller segments of Audio without any data loss. The real issue with this step in the process is the labeling of the audio splits themselves. While I want as much of this project to be modular and very easy to plug-and-play with different parts of it, the naming function I created I believe is the best route forward if you are going to be continuing on into the transcription process. If you aren't continuing on and just want the audio splits, the use your own naming function and label each split whatever you like. But currently, the transcription function that utilized the create audio splits function is hard coded to find only splits named by my function.
+
+This is just due to how to easily stitch the splits back together. The simplest solution I could think of and the one I chose to implement, was to naming the files with an integer range. Incrementing with each subsequent audio split. So that when stitching them back together I could just run a loop from zero to length of audio file divided by the Google Audio clip size (I believe 18,000ms).
+
+Additionally, there are boolean parameters to delete the original audios that was split from the video files, and/ or delete the constructed audio splits.
+
+Once all transcripts are completed, they are stored, and the path the to storage directory is returned to the user to ensure the storage location is understood.
 
 ### tfidf
 
@@ -233,6 +257,10 @@ I asked for an API link, and searched the other Legistar services, was even poin
 Is it possible to make it so that python script is auto running and scrapes the videos pages every so often, on a new video detected, it downloads the associated event data, and processes the transcript, and then deletes the video from the local while storing everything else?
 
 This would save on storage costs and processing time if I am not mistaken...
+
+...
+
+Testing the searching, 0.5 seconds really isn't the worst when it has to load the entire tfidf tree anyway..
 
 [Back to Tools](#tools)
 
