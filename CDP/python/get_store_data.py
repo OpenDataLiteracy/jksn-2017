@@ -471,7 +471,7 @@ def strip_audio_from_directory(video_dir, audio_dir, video_dir_cleaning_function
     if prints:
         print('set cwd to:', os.getcwd())
 
-    completed_strips
+    completed_strips = 0
 
     # for each video in the found directory
     for video_file in os.listdir():
