@@ -1,3 +1,6 @@
 configure_keys.py
 __pycache__
-storage
+Audio
+Video
+tfidf.json
+video_feeds.json

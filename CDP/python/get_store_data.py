@@ -19,7 +19,7 @@ import Levenshtein
 
 
 # database configuration and admin settings
-from configure_keys import *
+# from configure_keys import *
 
 
 # DATABASE CONNECTION
@@ -193,6 +193,7 @@ def video_to_audio_rename(video_in):
 #   path: the label for a general feed
 #   routes: the passed through route information
 def scrape_seattle_channel(path, routes, prints=True):
+
     # request the url and scrape the page to collect information
     r = requests.get(routes[0])
     soup = bs(r.content, 'html.parser')
@@ -237,6 +238,9 @@ def scrape_seattle_channel(path, routes, prints=True):
         # body name
         path_feed['body'] = routes[1]
 
+        # path name
+        path_feed['path'] = path
+
         # append this feed to list of feeds
         path_feeds.append(path_feed)
 
@@ -276,24 +280,69 @@ def scrape_seattle_channel(path, routes, prints=True):
 #
 #       path_feeds formatted:
 #           '[ path_feed, path_feed, ... , path_feed ]'
-def get_video_feeds(packed_routes, storage_path, scaping_function=scrape_seattle_channel, prints=False, toLocal=True):
+def get_video_feeds(packed_routes, storage_path, scaping_function=scrape_seattle_channel, prints=True, toLocal=True):
 
-    # create empty dictionary to store video information
-    constructed_feeds = dict()
+    # create empty list to store video information
+    constructed_feeds = list()
 
     # for each path and packed_route
     for path, routes in packed_routes.items():
         if prints:
             print('starting work on:', path)
 
-        # attach the found feeds to the storage dictionary
-        constructed_feeds[path] = scrape_seattle_channel(path=path, routes=routes, prints=prints)
+        # attach the found feeds to the storage list
+        for item in scrape_seattle_channel(path=path, routes=routes, prints=prints):
+            constructed_feeds.append(item)
 
     # store the found feeds locally
     if toLocal:
+        previous_feeds = list()
+
+        # add to previous store
+        try:
+
+            # read the previous store
+            with open(storage_path, 'r') as previous_store:
+                temp = previous_store.read()
+
+            # safety
+            previous_store.close()
+            time.sleep(2)
+
+            # load the store data
+            previous_feeds = json.loads(temp)
+
+            if prints:
+                print('previous store length:\t', len(previous_feeds))
+
+            previous_videos = list()
+
+            for previous_feed in previous_feeds:
+                previous_videos.append(previous_feed['video'])
+
+            # only add new items
+            for new_feed in constructed_feeds:
+
+                if new_feed['video'] not in previous_videos:
+                    previous_feeds.append(name_feed)
+
+            if prints:
+                print('new store length:\t', len(previous_feeds))
+
+            # set the new feeds appended to old
+            constructed_feeds = previous_feeds
+
+        # no previous store found, create new
+        except Exception as e:
+            print(e)
+
+            if prints:
+                print('no previous storage found...')
+
         with open(storage_path, 'w', encoding='utf-8') as outfile:
             json.dump(constructed_feeds, outfile)
 
+        # safety
         outfile.close()
         time.sleep(2)
 
@@ -318,15 +367,13 @@ def get_video_feeds(packed_routes, storage_path, scaping_function=scrape_seattle
 #       video_json formatted:
 #           '{ label :  data }'
 #
-#   path: the path to where to store the videos
-#   throughput_path: the path to where audio will be stored
-#   end_path: the path to where transcripts are stored
-def get_video_sources(objects_file, path, throughput_path, end_path, prints=True):
+#   storage_path: the path to where to store the videos
+#   throughput_path: the path to where we can check if we need to store the video
+def get_video_sources(objects_file, storage_path, throughput_path, prints=True):
 
     # ensure path safety
-    path = check_path_safety(path)
+    storage_path = check_path_safety(storage_path)
     throughput_path = check_path_safety(throughput_path)
-    end_path = check_path_safety(end_path)
 
     # read the video_feeds
     with open(objects_file) as objects_:
@@ -335,58 +382,50 @@ def get_video_sources(objects_file, path, throughput_path, end_path, prints=True
     # ensure safe close
     objects_.close()
 
-    # for each label and list of data
-    for label, data in objects.items():
-        if prints:
-            print('starting video sources collection for:', label)
+    # for each dictionary in list of data
+    for datum in objects:
 
-        # for each dictionary in list of data
-        for datum in data:
+        # check that a video source exists
+        if datum['video'] != '':
 
-            # check that a video source exists
-            if datum['video'] != '':
+            # create a video tag for storage
+            try:
+                tag_start = datum['video'].index('_')
+                tag = datum['video'][tag_start + 1:]
+            except:
+                tag = datum['video'][-11:]
 
-                # create a video tag for storage
-                try:
-                    tag_start = datum['video'].index('_')
-                    tag = datum['video'][tag_start + 1:]
-                except:
-                    tag = datum['video'][-11:]
+            # ensure safety against errors
+            try:
 
-                # ensure safety against errors
-                try:
+                # check it the video exists
+                if os.path.exists(throughput_path + clean_video_filename(datum['path']) + '_' + tag[:-4] + '.wav'):
+                    if prints:
+                        print('audio stored previously, skipping', datum['video'], 'collection...')
 
-                    # check it the video exists
-                    if os.path.exists(path + clean_video_filename(label) + '_' + tag):
-                        if prints:
-                            print('video stored previously, skipping', datum['video'], 'collection...')
+                # video must need to be downloaded
+                else:
+                    if prints:
+                        print('collecting:', datum['video'])
 
-                    # video must need to be downloaded
-                    else:
-                        if prints:
-                            print('collecting:', datum['video'])
+                    # request the video source and store the file
+                    r = requests.get(datum['video'], stream=True)
+                    if r.status_code == 200:
+                        with open((storage_path + clean_video_filename(datum['path']) + '_' + tag), 'wb') as mp4_out:
+                            r.raw.decode_content = True
+                            shutil.copyfileobj(r.raw, mp4_out)
 
-                        # request the video source and store the file
-                        r = requests.get(datum['video'], stream=True)
-                        if r.status_code == 200:
-                            with open((path + clean_video_filename(label) + '_' + tag), 'wb') as mp4_out:
-                                r.raw.decode_content = True
-                                shutil.copyfileobj(r.raw, mp4_out)
+                        mp4_out.close()
+                        time.sleep(2)
 
-                            mp4_out.close()
-                            time.sleep(2)
+            # print the exception for error handling
+            except Exception as e:
 
-                        if prints:
-                            print('collected:', datum['video'])
+                print(e)
 
-                # print the exception for error handling
-                except Exception as e:
-
-                    print(e)
-
-        if prints:
-            print('completed collection for:', label)
-            print('-----------------------------------------------------------')
+    if prints:
+        print('completed all video collections')
+        print('----------------------------------------------------------------------')
 
 # strip_audio using subprocess to run ffmpeg
 #   project_directory: the overarching project directory, check_path_safety
@@ -394,14 +433,12 @@ def get_video_sources(objects_file, path, throughput_path, end_path, prints=True
 #   audio_dir: the specific audio directory to store, check_path_safety
 #   video_in: the specific video file to get
 #   audio_out: the specific audio file to store
-def strip_audio(project_directory, video_dir, audio_dir, video_in, audio_out):
-    command = 'ffmpeg -i '
+def strip_audio(video_dir, audio_dir, video_in, audio_out):
+    command = 'ffmpeg -hide_banner -i '
 
-    command += project_directory
     command += video_dir
     command += video_in
     command += ' -ab 160k -ac 2 -ar 44100 -vn '
-    command += project_directory
     command += audio_dir
     command += audio_out
 
@@ -413,21 +450,21 @@ def strip_audio(project_directory, video_dir, audio_dir, video_in, audio_out):
 #   audio_dir: the specific audio directory to store, check_path_safety
 #   naming_function: a function to construct a name for the output video_file
 #   delete_video: boolean value to decide if you want to keep the video portion or discard after audio construction
-def strip_audio_from_directory(project_directory, video_dir, audio_dir, video_dir_cleaning_function=rename_video_files, naming_function=video_to_audio_rename, end_path='transcripts/', delete_video=False, prints=True):
+def strip_audio_from_directory(video_dir, audio_dir, video_dir_cleaning_function=rename_video_files, naming_function=video_to_audio_rename, end_path='transcripts/', delete_video=False, prints=True):
 
     # check_path_safety for all path variables
-    project_directory = check_path_safety(project_directory)
     video_dir = check_path_safety(video_dir)
     audio_dir = check_path_safety(audio_dir)
 
-    if prints:
-        print('set cwd to:', os.getcwd)
-
     # ensure file naming conventions follow same pattern
-    video_dir_cleaning_function(project_directory + video_dir)
+    video_dir_cleaning_function(video_dir)
 
     # set working directory to the video_dir
-    os.chdir(project_directory + video_dir)
+    os.chdir(video_dir)
+
+    if prints:
+        print('set cwd to:', os.getcwd())
+
 
     # for each video in the found directory
     for video_file in os.listdir():
@@ -439,7 +476,7 @@ def strip_audio_from_directory(project_directory, video_dir, audio_dir, video_di
         try:
 
             # check if the audio exists
-            if os.path.exists(project_directory + audio_dir + audio_out_label):
+            if os.path.exists(audio_dir + audio_out_label):
                 if prints:
                     print('audio stored previously, skipping', video_file, 'strip...')
 
@@ -447,10 +484,10 @@ def strip_audio_from_directory(project_directory, video_dir, audio_dir, video_di
             else:
 
                 if prints:
-                    print('stripping audio using:', project_directory, video_dir, audio_dir, video_file, audio_out_label)
+                    print('stripping audio using:', video_dir, audio_dir, video_file, audio_out_label)
 
                 # strip the audio
-                strip_audio(project_directory, video_dir, audio_dir, video_file, audio_out_label)
+                strip_audio(video_dir, audio_dir, video_file, audio_out_label)
 
         except Exception as e:
 
@@ -465,7 +502,7 @@ def strip_audio_from_directory(project_directory, video_dir, audio_dir, video_di
                 if prints:
                     print('delete_video is marked as True, deleting original video file for:', audio_out_label)
 
-                os.remove(project_directory + video_dir + video_file)
+                os.remove(video_dir + video_file)
 
         # file already removed
         except FileNotFoundError as e:
@@ -629,7 +666,7 @@ def generate_transcript_from_audio_splits(audio_directory, naming_function=name_
 
             # no reason to stop transcription process with UVE, but alert user of error
             except sr.UnknownValueError as e:
-                print('Google Speech Recognition could not understand audio...', e)
+                pass
 
             # major error, stop the engine and return
             except sr.RequestError as e:
@@ -1188,23 +1225,25 @@ video_routes = {
 
 # REAL RUNNING
 
+main_path = 'C:/Users/jmax825/Desktop/jksn-2017/CDP/resources/'
+
 # @RUN
 # Run for video feeds
-get_video_feeds(packed_routes=video_routes, storage_path='C:/Users/Maxfield/Desktop/active/jksn-2017/CDP/python/storage/video_feeds.json')
+get_video_feeds(packed_routes=video_routes, storage_path=(main_path + 'video_feeds.json'))
 
 # @RUN
 # Run for mass video collection
-get_video_sources(objects_file='C:/Users/Maxfield/Desktop/active/jksn-2017/CDP/python/storage/video_feeds.json', path='D:/Videos', throughput_path='D:/Audio', end_path='D:/Audio/transcripts')
+get_video_sources(objects_file=(main_path + 'video_feeds.json'), storage_path=(main_path + 'Video/'), throughput_path=(main_path + 'Audio/'))
 
 # @RUN
 # Run for mass audio stripping
-strip_audio_from_directory(project_directory='D:/', video_dir='Videos/', audio_dir='Audio/', delete_video=True)
+#strip_audio_from_directory(video_dir=(main_path + 'Video/'), audio_dir=(main_path + 'Audio/'), delete_video=True)
 
 # @RUN
 # Run for mass transcripts
-generate_transcripts_from_directory(project_directory='D:/Audio', delete_splits=True)
+#generate_transcripts_from_directory(project_directory=(main_path + 'Audio/'), delete_splits=True)
 
 # @RUN
 # Run for mass tfidf
-generate_tfidf_from_directory(project_directory='D:/Audio/transcripts', output_file='D:/tfidf.json')
+#generate_tfidf_from_directory(project_directory=(main_path + 'Audio/transcripts'), output_file=(main_path + 'tfidf.json'))
 # pprint(predict_relevancy(search='transportation funding budget', tfidf_store='D:/tfidf.json'))
