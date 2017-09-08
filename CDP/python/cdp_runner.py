@@ -1,7 +1,5 @@
 from get_store_data import *
 
-project_directory = 'D:/jksn-2017/CDP/resources/'
-
 def generate_log_file(log_name, log_type, log_object, log_directory):
     log_directory = check_path_safety(log_directory)
 
@@ -152,4 +150,5 @@ def run_cdp(project_directory, legistar_routes, video_routes, log_directory, blo
         print('---------------------------------------------------------------')
         return e
 
+project_directory = 'D:/jksn-2017/CDP/resources/'
 print(run_cdp(project_directory=project_directory, legistar_routes=all_routes, video_routes=video_routes, log_directory=(project_directory + 'logs/')))
