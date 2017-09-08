@@ -382,6 +382,8 @@ def get_video_sources(objects_file, storage_path, throughput_path, prints=True):
     # ensure safe close
     objects_.close()
 
+    completed_stores = 0
+
     # for each dictionary in list of data
     for datum in objects:
 
@@ -415,6 +417,8 @@ def get_video_sources(objects_file, storage_path, throughput_path, prints=True):
                             r.raw.decode_content = True
                             shutil.copyfileobj(r.raw, mp4_out)
 
+                            completed_stores += 1
+
                         mp4_out.close()
                         time.sleep(2)
 
@@ -426,6 +430,8 @@ def get_video_sources(objects_file, storage_path, throughput_path, prints=True):
     if prints:
         print('completed all video collections')
         print('----------------------------------------------------------------------')
+
+    return completed_stores
 
 # strip_audio using subprocess to run ffmpeg
 #   project_directory: the overarching project directory, check_path_safety
@@ -465,6 +471,7 @@ def strip_audio_from_directory(video_dir, audio_dir, video_dir_cleaning_function
     if prints:
         print('set cwd to:', os.getcwd())
 
+    completed_strips
 
     # for each video in the found directory
     for video_file in os.listdir():
@@ -489,6 +496,8 @@ def strip_audio_from_directory(video_dir, audio_dir, video_dir_cleaning_function
                 # strip the audio
                 strip_audio(video_dir, audio_dir, video_file, audio_out_label)
 
+                completed_strips += 1
+
         except Exception as e:
 
             print(e)
@@ -509,6 +518,8 @@ def strip_audio_from_directory(video_dir, audio_dir, video_dir_cleaning_function
 
             if prints:
                 print('File already removed')
+
+    return completed_strips
 
 # name_audio_splits for a project_directory, a targetted output_directory, and a list of audio_splits
 #   project_directory: the overarching project directory path
@@ -712,6 +723,8 @@ def generate_transcripts_from_directory(project_directory, transcript_naming_fun
         print('starting work for', project_directory, '...')
         print('-------------------------------------------------------')
 
+    completed_transcripts = 0
+
     # for all .wav files create audio splits and generate transcript
     for filename in os.listdir():
 
@@ -728,6 +741,8 @@ def generate_transcripts_from_directory(project_directory, transcript_naming_fun
 
             # create the transcript from the audio split directory
             transcript = generate_transcript_from_audio_splits(audio_directory=split_audio_dir, naming_function=transcript_naming_function, prints=prints)
+
+            completed_transcripts += 1
 
             # check if the user wants to delete the created audio splits
             if delete_splits:
@@ -765,6 +780,8 @@ def generate_transcripts_from_directory(project_directory, transcript_naming_fun
 
     if prints:
         print('completed transcript generation for all files in', project_directory)
+
+    return completed_transcripts
 
 # RELEVANCY
 
@@ -1183,8 +1200,7 @@ def get_stored_data(path, return_data=True):
 
 # all_routes is the legistar data packed_routes object
 all_routes = {
-            'events': ['http://webapi.legistar.com/v1/seattle/Events', 'EventId', clean_events_data],
-            'bodies': ['http://webapi.legistar.com/v1/seattle/Bodies', 'BodyId', clean_bodies_data]
+            'events': ['http://webapi.legistar.com/v1/seattle/Events', 'EventId', clean_events_data]
 }
 
 # video_routes is the seattle_channel packed_routes object
@@ -1222,28 +1238,3 @@ video_routes = {
 #     for item in datum:
 #         body_events = get_test_data('http://webapi.legistar.com/v1/seattle/EventDates/' + str(item['BodyId']) + '?FutureDatesOnly=true', prints=False)
 #         print(item['BodyName'], body_events)
-
-# REAL RUNNING
-
-main_path = 'C:/Users/jmax825/Desktop/jksn-2017/CDP/resources/'
-
-# @RUN
-# Run for video feeds
-get_video_feeds(packed_routes=video_routes, storage_path=(main_path + 'video_feeds.json'))
-
-# @RUN
-# Run for mass video collection
-get_video_sources(objects_file=(main_path + 'video_feeds.json'), storage_path=(main_path + 'Video/'), throughput_path=(main_path + 'Audio/'))
-
-# @RUN
-# Run for mass audio stripping
-#strip_audio_from_directory(video_dir=(main_path + 'Video/'), audio_dir=(main_path + 'Audio/'), delete_video=True)
-
-# @RUN
-# Run for mass transcripts
-#generate_transcripts_from_directory(project_directory=(main_path + 'Audio/'), delete_splits=True)
-
-# @RUN
-# Run for mass tfidf
-#generate_tfidf_from_directory(project_directory=(main_path + 'Audio/transcripts'), output_file=(main_path + 'tfidf.json'))
-# pprint(predict_relevancy(search='transportation funding budget', tfidf_store='D:/tfidf.json'))
