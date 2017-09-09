@@ -1,9 +1,9 @@
 # Council Data Project
 Multiple tools, mainly focused on searching, transparency, and accountability for City Councils.
 
-**If you are looking to setup your own version of CDP, jump to: [Setup and Automation](#setup-and-automation)**
-
 Created by Jackson Maxfield Brown and Dr. Nicholas Weber
+
+**If you are looking to setup your own version of CDP, jump to: [Setup and Automation](#setup-and-automation)**
 
 - [Project Updates and Timeline](#updates)
 - [Background](#background)
