@@ -27,7 +27,7 @@ Created by Jackson Maxfield Brown and Dr. Nicholas Weber
 - [Setup and Automation](#setup-and-automation)
    - [Software Installations](#software-installations)
    - [Automation](#automation)
-   - [Testing][#testing]
+   - [Testing](#testing)
 - [Final Comments](#final-comments)
 
 ## Updates
