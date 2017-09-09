@@ -324,7 +324,7 @@ def get_video_feeds(packed_routes, storage_path, scaping_function=scrape_seattle
             for new_feed in constructed_feeds:
 
                 if new_feed['video'] not in previous_videos:
-                    previous_feeds.append(name_feed)
+                    previous_feeds.append(new_feed)
 
             if prints:
                 print('new store length:\t', len(previous_feeds))

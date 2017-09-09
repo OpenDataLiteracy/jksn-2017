@@ -150,5 +150,5 @@ def run_cdp(project_directory, legistar_routes, video_routes, log_directory, blo
         print('---------------------------------------------------------------')
         return e
 
-project_directory = 'D:/jksn-2017/CDP/resources/'
+project_directory = 'C:/Users/jmax825/desktop/jksn-2017/CDP/resources/'
 print(run_cdp(project_directory=project_directory, legistar_routes=all_routes, video_routes=video_routes, log_directory=(project_directory + 'logs/')))
