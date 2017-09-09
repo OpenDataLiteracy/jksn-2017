@@ -13,7 +13,6 @@ import os
 from pydub import AudioSegment
 import math
 import operator
-from PyDictionary import PyDictionary
 import sys
 import Levenshtein
 
@@ -291,7 +290,7 @@ def get_video_feeds(packed_routes, storage_path, scaping_function=scrape_seattle
             print('starting work on:', path)
 
         # attach the found feeds to the storage list
-        for item in scrape_seattle_channel(path=path, routes=routes, prints=prints):
+        for item in scraping_function(path=path, routes=routes, prints=prints):
             constructed_feeds.append(item)
 
     # store the found feeds locally
@@ -374,6 +373,10 @@ def get_video_sources(objects_file, storage_path, throughput_path, prints=True):
     # ensure path safety
     storage_path = check_path_safety(storage_path)
     throughput_path = check_path_safety(throughput_path)
+
+    # ensure directory safety
+    if not os.path.exists(storage_path):
+        os.mkdir(storage_path)
 
     # read the video_feeds
     with open(objects_file) as objects_:
@@ -461,6 +464,9 @@ def strip_audio_from_directory(video_dir, audio_dir, video_dir_cleaning_function
     # check_path_safety for all path variables
     video_dir = check_path_safety(video_dir)
     audio_dir = check_path_safety(audio_dir)
+
+    if not os.path.exists(audio_dir):
+        os.mkdir(audio_dir)
 
     # ensure file naming conventions follow same pattern
     video_dir_cleaning_function(video_dir)
@@ -1198,34 +1204,6 @@ def get_stored_data(path, return_data=True):
     else:
         return focus.get()
 
-
-# VARIABLES AND OBJECTS
-
-# all_routes is the legistar data packed_routes object
-all_routes = {
-            'events': ['http://webapi.legistar.com/v1/seattle/Events', 'EventId', clean_events_data]
-}
-
-# video_routes is the seattle_channel packed_routes object
-video_routes = {
-                'briefings': ['http://www.seattlechannel.org/CouncilBriefings', 'Council Briefing'],
-                'budget': ['http://www.seattlechannel.org/BudgetCommittee', 'Select Budget Committee'],
-                'full': ['http://www.seattlechannel.org/FullCouncil', 'Full Council'],
-                'park': ['http://www.seattlechannel.org/mayor-and-council/city-council/seattle-park-district-board', 'Select Committee on Parks Funding'],
-                'transportation': ['http://www.seattlechannel.org/mayor-and-council/city-council/seattle-transportation-benefit-district', 'Select Committee on Transportation Funding'],
-                'arenas': ['http://www.seattlechannel.org/mayor-and-council/city-council/select-committee-on-civic-arenas', 'Select Committee on Civic Arenas'],
-                'housing': ['http://www.seattlechannel.org/mayor-and-council/city-council/select-committee-on-the-2016-seattle-housing-levy', 'Select Committee on the 2016 Seattle Housing Levy'],
-                'lighting': ['http://www.seattlechannel.org/mayor-and-council/city-council/select-committee-on-the-2016-seattle-city-light-strategic-planning', 'Select Committee on the 2016 Seattle City Light Strategic Planning'],
-                'finance': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-affordable-housing-neighborhoods-and-finance-committee', 'Affordable Housing, Neighborhoods, and Finance Committee'],
-                'utilities': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-civil-rights-utilities-economic-development-and-arts-committee', 'Civil Rights, Utilities, Economic Development, and Arts Committee'],
-                'education': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-education-equity-and-governance-committee', 'Education and Governance Committee'],
-                'energy': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-energy-and-environment-committee', 'Energy and Environment Committee'],
-                'communities': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-gender-equity-safe-communities-and-new-americans-committee', 'Gender Equity, Safe Communities, and New Americans Committee'],
-                'public health': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-human-services-and-public-health-committee', 'Human Services and Public Health Committee'],
-                'civic centers': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-parks-seattle-center-libraries-and-waterfront-committee', 'Parks, Seattle Center, Libraries, and Waterfront Committee'],
-                'zoning': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-planning-land-use-and-zoning-committee', 'Planning, Land Use, and Zoning Committee'],
-                'sustainability': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-sustainability-and-transportation-committee', 'Sustainability and Transportation Committee']
-}
 
 # TEMPORARY AND TESTING
 
