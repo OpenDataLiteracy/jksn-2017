@@ -408,6 +408,10 @@ def get_video_sources(objects_file, storage_path, throughput_path, prints=True):
                     if prints:
                         print('audio stored previously, skipping', datum['video'], 'collection...')
 
+                elif os.path.exists(storage_path + clean_video_filename(datum['path']) + tag):
+                    if prints:
+                        print('video stored previously, skipping', datum['video'], 'collection...')
+
                 # video must need to be downloaded
                 else:
                     if prints:
