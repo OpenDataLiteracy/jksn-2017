@@ -382,18 +382,18 @@ def my_scraper(path, routes):
 
   constructed_feeds = list()
 
-  for each video element available in route[0]:
+  for each video element available in routes[0]:
 
     feed_info = dict()
     feed_info['path'] = path
-    feed_info['body'] = route[1]
+    feed_info['body'] = routes[1]
 
     # feed_info['source'] = ...
     # feed_info['agenda'] = ...
     # feed_info['datetime'] = ...
     # feed_info['link'] = ...
 
-    # collected_feeds.append(feed_info)
+    collected_feeds.append(feed_info)
 
   return constructed_feeds
 
@@ -438,18 +438,18 @@ def my_scraper(path, routes):
 
   constructed_feeds = list()
 
-  for each video element available in route[0]:
+  for each video element available in routes[0]:
 
     feed_info = dict()
     feed_info['path'] = path
-    feed_info['body'] = route[1]
+    feed_info['body'] = routes[1]
 
     # feed_info['source'] = ...
     # feed_info['agenda'] = ...
     # feed_info['datetime'] = ...
     # feed_info['link'] = ...
 
-    # collected_feeds.append(feed_info)
+    collected_feeds.append(feed_info)
 
   return constructed_feeds
 
