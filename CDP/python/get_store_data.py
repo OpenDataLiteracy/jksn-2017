@@ -279,7 +279,7 @@ def scrape_seattle_channel(path, routes, prints=True):
 #
 #       path_feeds formatted:
 #           '[ path_feed, path_feed, ... , path_feed ]'
-def get_video_feeds(packed_routes, storage_path, scaping_function=scrape_seattle_channel, prints=True, toLocal=True):
+def get_video_feeds(packed_routes, storage_path, scraping_function=scrape_seattle_channel, prints=True, toLocal=True):
 
     # create empty list to store video information
     constructed_feeds = list()
@@ -408,7 +408,7 @@ def get_video_sources(objects_file, storage_path, throughput_path, prints=True):
                     if prints:
                         print('audio stored previously, skipping', datum['video'], 'collection...')
 
-                elif os.path.exists(storage_path + clean_video_filename(datum['path']) + tag):
+                elif os.path.exists(storage_path + clean_video_filename(datum['path']) + '_' + tag):
                     if prints:
                         print('video stored previously, skipping', datum['video'], 'collection...')
 
