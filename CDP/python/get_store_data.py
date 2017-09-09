@@ -612,6 +612,9 @@ def split_audio_into_parts(project_directory, audio_file, naming_function=name_a
         i += 1
 
     if prints:
+        print('')
+
+    if prints:
         print('created audio splits for:\t', audio_file, '\t||\t', store_directory)
 
     # return the store_directory path
