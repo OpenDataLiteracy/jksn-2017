@@ -410,6 +410,8 @@ Here is a list of other default settings:
 - run_duration = -1; total system runtime, if -1, runs infinitely, else, duration in seconds
 - logging = True; adds or removes log creation for the automated runner
 
+To run, open a Command Prompt, Terminal, etc. in Administrator. Navigate directories to where you runner python file is located. And run `python my_runner.py`
+
 That's it. It will run and collect data until you manually shut it down unless you changed the default settings to have a run_duration.
 
 ### Testing

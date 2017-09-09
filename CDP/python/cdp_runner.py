@@ -215,4 +215,4 @@ def run_cdp(project_directory, legistar_routes, video_routes, scraping_function,
         return e
 
 project_directory = 'C:/Users/jmax825/desktop/jksn-2017/CDP/resources/'
-print(run_cdp(project_directory=project_directory, legistar_routes=all_routes, video_routes=video_routes, log_directory=(project_directory + 'logs/')))
+print(run_cdp(project_directory=project_directory, legistar_routes=all_routes, video_routes=video_routes, scraping_function=scrape_seattle_channel, log_directory=(project_directory + 'logs/')))
