@@ -22,8 +22,8 @@ video_routes = {
                 'education': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-education-equity-and-governance-committee', 'Education and Governance Committee'],
                 'energy': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-energy-and-environment-committee', 'Energy and Environment Committee'],
                 'communities': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-gender-equity-safe-communities-and-new-americans-committee', 'Gender Equity, Safe Communities, and New Americans Committee'],
-                'public health': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-human-services-and-public-health-committee', 'Human Services and Public Health Committee'],
-                'civic centers': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-parks-seattle-center-libraries-and-waterfront-committee', 'Parks, Seattle Center, Libraries, and Waterfront Committee'],
+                'public_health': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-human-services-and-public-health-committee', 'Human Services and Public Health Committee'],
+                'civic_centers': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-parks-seattle-center-libraries-and-waterfront-committee', 'Parks, Seattle Center, Libraries, and Waterfront Committee'],
                 'zoning': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-planning-land-use-and-zoning-committee', 'Planning, Land Use, and Zoning Committee'],
                 'sustainability': ['http://www.seattlechannel.org/mayor-and-council/city-council/2016/2017-sustainability-and-transportation-committee', 'Sustainability and Transportation Committee']
 }
@@ -97,6 +97,7 @@ def generate_log_file(log_name, log_type, log_object, log_directory):
 
 # run_cdp for a city_council
 #   project_directory: the overarching project directory path where all files will be stored
+#   json_directory: the directory you would like to store all created json files
 #   legistar_routes: the packed_routes object with legistar information
 #   video_routes: the packed_routes object with video collection information
 #   log_directory: the location of where logs will be stored
@@ -107,7 +108,7 @@ def generate_log_file(log_name, log_type, log_object, log_directory):
 #   block_sleep_duration: time in seconds to sleep after a single collection cycle
 #   run_duration: time in seconds to run the system for
 #   logging: boolean to keep or stop logging
-def run_cdp(project_directory, legistar_routes, video_routes, scraping_function, log_directory, delete_videos=False, delete_splits=False, test_search_term='bicycle infrastructure', prints=True, block_sleep_duration=21600, run_duration=-1, logging=True):
+def run_cdp(project_directory, json_directory, legistar_routes, video_routes, scraping_function, log_directory, delete_videos=False, delete_splits=False, test_search_term='bicycle infrastructure', prints=True, block_sleep_duration=21600, run_duration=-1, logging=True):
 
     # ensure safety of the entire run
     try:
@@ -135,7 +136,7 @@ def run_cdp(project_directory, legistar_routes, video_routes, scraping_function,
             # @RUN
             # Run for video feeds
             feeds_start = time.time()
-            block['completed_feeds'] = get_video_feeds(packed_routes=video_routes, storage_path=(project_directory + 'video_feeds.json'), scraping_function=scraping_function, prints=prints)
+            block['completed_feeds'] = get_video_feeds(packed_routes=video_routes, storage_path=(json_directory + 'video_feeds.json'), scraping_function=scraping_function, prints=prints)
             feeds_duration = time.time() - feeds_start
 
             block['feeds_duration'] = (float(feeds_duration) / 60.0 / 60.0)
@@ -143,7 +144,7 @@ def run_cdp(project_directory, legistar_routes, video_routes, scraping_function,
             # @RUN
             # Run for mass video collection
             videos_start = time.time()
-            block['completed_videos'] = get_video_sources(objects_file=(project_directory + 'video_feeds.json'), storage_path=(project_directory + 'Video/'), throughput_path=(project_directory + 'Audio/'), prints=prints)
+            block['completed_videos'] = get_video_sources(objects_file=(json_directory + 'video_feeds.json'), storage_path=(project_directory + 'Video/'), throughput_path=(project_directory + 'Audio/'), prints=prints)
             videos_duration = time.time() - videos_start
 
             block['videos_duration'] = (float(videos_duration) / 60.0 / 60.0)
@@ -167,7 +168,7 @@ def run_cdp(project_directory, legistar_routes, video_routes, scraping_function,
             # @RUN
             # Run for mass tfidf
             tfidf_start = time.time()
-            generate_tfidf_from_directory(project_directory=(project_directory + 'Audio/transcripts'), output_file=(project_directory + 'tfidf.json'), prints=prints)
+            generate_tfidf_from_directory(project_directory=(project_directory + 'Audio/transcripts'), output_file=(json_directory + 'tfidf.json'), prints=prints)
             tfidf_duration = time.time() - tfidf_start
 
             block['tfidf_duration'] = (float(tfidf_duration) / 60.0 / 60.0)
@@ -175,7 +176,7 @@ def run_cdp(project_directory, legistar_routes, video_routes, scraping_function,
             # @RUN
             # Run for testing speed of search
             search_start = time.time()
-            pprint(predict_relevancy(search=test_search_term, tfidf_store=(project_directory + 'tfidf.json')))
+            pprint(predict_relevancy(search=test_search_term, tfidf_store=(json_directory + 'tfidf.json')))
             search_duration = time.time() - search_start
 
             block['search_duration'] = (float(search_duration) / 60.0 / 60.0)
@@ -214,5 +215,5 @@ def run_cdp(project_directory, legistar_routes, video_routes, scraping_function,
         print('---------------------------------------------------------------')
         return e
 
-project_directory = 'C:/Users/jmax825/desktop/jksn-2017/CDP/resources/'
-print(run_cdp(project_directory=project_directory, legistar_routes=all_routes, video_routes=video_routes, scraping_function=scrape_seattle_channel, log_directory=(project_directory + 'logs/')))
+#project_directory = 'C:/Users/jmax825/desktop/jksn-2017/CDP/resources/'
+#print(run_cdp(project_directory=project_directory, json_directory=(project_directory + 'stores/'), legistar_routes=all_routes, video_routes=video_routes, scraping_function=scrape_seattle_channel, log_directory=(project_directory + 'logs/')))

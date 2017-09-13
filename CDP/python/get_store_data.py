@@ -12,7 +12,6 @@ from pprint import pprint
 import os
 from pydub import AudioSegment
 import math
-import operator
 import sys
 import Levenshtein
 
@@ -20,12 +19,45 @@ import Levenshtein
 # database configuration and admin settings
 # from configure_keys import *
 
+# check_path_safety to ensure paths end with '/'
+#   path: the directory path to be checked for safe endings
+def check_path_safety(path):
+    if '/' == path[:1]:
+        path = path[1:]
+
+    if '/' != path[-1:]:
+        path += '/'
+
+    return path
+
 
 # DATABASE CONNECTION
 # firebase = pyrebase.initialize_app(config)
 # db = firebase.database()
 
 # LEGISTAR
+
+def clean_time_data(item):
+
+    try:
+        stored_time = item['EventTime'].split(':')
+
+        stored_min = stored_time[1].split(' ')
+
+        calc_hour = float(stored_time[0])
+        calc_minutes = float(stored_min[0]) / 60.0
+        add_hours = 0
+        if stored_min[1] == 'PM':
+            add_hours += 12
+
+        calc_time = (calc_hour + add_hours + calc_minutes)
+
+        item['EventCalculatedTime'] = calc_time
+
+    except:
+        item['EventCalculatedTime'] = 24.01
+
+    return item
 
 # clean_events_data for an event item
 #   item: the event unique item returned from the legistar events api
@@ -62,7 +94,13 @@ def clean_bodies_data(item):
 #
 #   packed_route formatted:
 #       '{ path : [ url, storage key, cleaning_func ] }'
-def get_all_data(packed_routes, prints=False, toLocal=True):
+def get_all_data(packed_routes, storage_directory, prints=True):
+
+    # ensure storage safety
+    check_path_safety(storage_directory)
+
+    # return object
+    stored_data = dict()
 
     # for each path and packed_route
     for path, routes in packed_routes.items():
@@ -74,42 +112,102 @@ def get_all_data(packed_routes, prints=False, toLocal=True):
         r = requests.get(routes[0])
         r = r.json()
 
-        # check output target
-        if not toLocal:
-            for item in r:
-                if prints:
-                    print('working on:', item)
+        # # check output target
+        # if not toLocal:
+        #     for item in r:
+        #         if prints:
+        #             print('working on:', item)
+        #
+        #         # find the storage key
+        #         store_id = item[routes[1]]
+        #         del item[routes[1]]
+        #
+        #         # clean data
+        #         item = routes[2](item)
+        #
+        #         if prints:
+        #             print('completed:', item)
+        #
+        #         # store the data in the database
+        #         db.child(path).child(store_id).set(item)
+        #
+        #         if prints:
+        #             print('stored:', path, store_id)
+        #             print('-------------------------------------------------------')
 
-                # find the storage key
-                store_id = item[routes[1]]
-                del item[routes[1]]
-
-                # clean data
-                item = routes[2](item)
-
-                if prints:
-                    print('completed:', item)
-
-                # store the data in the database
-                db.child(path).child(store_id).set(item)
-
-                if prints:
-                    print('stored:', path, store_id)
-                    print('-------------------------------------------------------')
         # to local
-        else:
-            # clean data
-            cleaned_r = list()
-            for item in r:
-                item = routes[2](item)
-                cleaned_r.append(item)
 
-            # store data locally
-            with open('WA-WS/poc/python/local_store_' + path + '.json', 'w', encoding='utf-8') as outfile:
-                json.dump(cleaned_r, outfile)
+        # clean data
+        cleaned_r = list()
+        for item in r:
+            item = routes[2](item)
+            cleaned_r.append(item)
 
-            outfile.close()
-            time.sleep(2)
+        storage_path = storage_directory + 'local_store_' + path + '.json'
+
+        # store data locally
+        with open(storage_path, 'w', encoding='utf-8') as outfile:
+            json.dump(cleaned_r, outfile)
+
+        outfile.close()
+        time.sleep(2)
+
+        if prints:
+            print('stored', path, 'at:\t', storage_path)
+
+        stored_data[path] = cleaned_r
+
+    return stored_data
+
+def get_data_by_routed(packed_routes, storage_directory, prints=True):
+
+    # ensure storage safety
+    check_path_safety(storage_directory)
+
+    # return object
+    stored_data = dict()
+
+    # for each path and packed_route
+    for path, routes in packed_routes.items():
+        if prints:
+            print('getting data from:', routes[0])
+            print('-----------------------------------------------------------')
+
+        # request the url and store the data in json
+        r = requests.get(routes[0])
+        r = r.json()
+
+        # clean data
+        cleaned_r = dict()
+        for item in r:
+            item = routes[2](item)
+            item = clean_time_data(item)
+
+            try:
+                cleaned_r[item[routes[3]]].append(item)
+            except:
+                cleaned_r[item[routes[3]]] = list()
+                cleaned_r[item[routes[3]]].append(item)
+
+        sorted_r = dict()
+        for key, data in cleaned_r.items():
+            sorted_r[key] = sorted(data, key=lambda x: x['EventCalculatedTime'])
+
+        storage_path = storage_directory + 'local_store_' + path + '_by_' + routes[3] + '.json'
+
+        # store data locally
+        with open(storage_path, 'w', encoding='utf-8') as outfile:
+            json.dump(sorted_r, outfile)
+
+        outfile.close()
+        time.sleep(2)
+
+        if prints:
+            print('stored', path, 'at:\t', storage_path)
+
+        stored_data[path] = sorted_r
+
+    return stored_data
 
 # get_test_data for url
 #   url: the legistar url to pull data from
@@ -151,42 +249,60 @@ def clean_video_filename(item):
 
     return item
 
-# rename_video_files for an os location
-#   video_dir: path in os to video files
+# clean_audio_filename for an audio file
+#   item: the filename to be cleaned of odd words and characters
+def clean_audio_filename(item):
+
+    # check if 'special' in item
+    if 'special' in item:
+
+        item = item.replace('special', '')
+
+    return item
+
+# rename_files for an os location
+#   directory: path in os to files
 #   cleaning_func: the cleaning function to repair or fix filenames
-def rename_video_files(video_dir, cleaning_func=clean_video_filename):
+def rename_files(directory, cleaning_func):
 
     # ensure path safety
-    video_dir = check_path_safety(video_dir)
+    directory = check_path_safety(directory)
 
     # get the current working directory for comparison
     cwd = os.getcwd()
 
     # check if the path is in the current working directory
-    if video_dir not in cwd:
+    if directory not in cwd:
 
         # update the directory to match path
-        os.chdir(video_dir)
+        os.chdir(directory)
 
     # for each file run the cleaning_func
     for filename in os.listdir():
-        os.rename(filename, clean_video_filename(filename))
-
-# check_path_safety to ensure paths end with '/'
-#   path: the directory path to be checked for safe endings
-def check_path_safety(path):
-    if '/' == path[:1]:
-        path = path[1:]
-
-    if '/' != path[-1:]:
-        path += '/'
-
-    return path
+        if os.path.isfile(directory + filename):
+            os.rename(filename, cleaning_func(filename))
 
 # video_to_audio_rename with '.wav'
 #   video_in: the path for the video file to be renamed
 def video_to_audio_rename(video_in):
-    return video_in[:-4] + '.wav'
+    video_in = video_in[:-4]
+
+    if video_in[-2:] == 'VV':
+        video_in = video_in[:-2]
+
+    if video_in[-2:] == 'vV':
+        video_in = video_in[:-2]
+
+    if video_in[-1:] == 'V':
+        video_in = video_in[:-1]
+
+    if video_in[-1:] == 'v':
+        video_in = video_in[:-1]
+
+    if video_in[-1:] == 's':
+        video_in = video_in[:-1] + 'a'
+
+    return video_in + '.wav'
 
 # used as the default scraping_function for get_video_feeds
 #   path: the label for a general feed
@@ -279,7 +395,10 @@ def scrape_seattle_channel(path, routes, prints=True):
 #
 #       path_feeds formatted:
 #           '[ path_feed, path_feed, ... , path_feed ]'
-def get_video_feeds(packed_routes, storage_path, scraping_function=scrape_seattle_channel, prints=True, toLocal=True):
+def get_video_feeds(packed_routes, storage_directory, scraping_function=scrape_seattle_channel, prints=True):
+
+    # ensure storage safety
+    storage_directory = check_path_safety(storage_directory)
 
     # create empty list to store video information
     constructed_feeds = list()
@@ -290,60 +409,62 @@ def get_video_feeds(packed_routes, storage_path, scraping_function=scrape_seattl
             print('starting work on:', path)
 
         # attach the found feeds to the storage list
-        for item in scraping_function(path=path, routes=routes, prints=prints):
+        for item in scraping_function(path=clean_video_filename(path), routes=routes, prints=prints):
             constructed_feeds.append(item)
 
     # store the found feeds locally
-    if toLocal:
-        previous_feeds = list()
+    previous_feeds = list()
 
-        # add to previous store
-        try:
+    # add to previous store
+    try:
 
-            # read the previous store
-            with open(storage_path, 'r') as previous_store:
-                temp = previous_store.read()
-
-            # safety
-            previous_store.close()
-            time.sleep(2)
-
-            # load the store data
-            previous_feeds = json.loads(temp)
-
-            if prints:
-                print('previous store length:\t', len(previous_feeds))
-
-            previous_videos = list()
-
-            for previous_feed in previous_feeds:
-                previous_videos.append(previous_feed['video'])
-
-            # only add new items
-            for new_feed in constructed_feeds:
-
-                if new_feed['video'] not in previous_videos:
-                    previous_feeds.append(new_feed)
-
-            if prints:
-                print('new store length:\t', len(previous_feeds))
-
-            # set the new feeds appended to old
-            constructed_feeds = previous_feeds
-
-        # no previous store found, create new
-        except Exception as e:
-            print(e)
-
-            if prints:
-                print('no previous storage found...')
-
-        with open(storage_path, 'w', encoding='utf-8') as outfile:
-            json.dump(constructed_feeds, outfile)
+        # read the previous store
+        with open(storage_path, 'r', encoding='utf-8') as previous_store:
+            temp = previous_store.read()
 
         # safety
-        outfile.close()
+        previous_store.close()
         time.sleep(2)
+
+        # load the store data
+        previous_feeds = json.loads(temp)
+
+        if prints:
+            print('previous store length:\t', len(previous_feeds))
+
+        previous_videos = list()
+
+        for previous_feed in previous_feeds:
+            previous_videos.append(previous_feed['video'])
+
+        # only add new items
+        for new_feed in constructed_feeds:
+
+            if new_feed['video'] not in previous_videos:
+                previous_feeds.append(new_feed)
+
+        if prints:
+            print('new store length:\t', len(previous_feeds))
+
+        # set the new feeds appended to old
+        constructed_feeds = previous_feeds
+
+    # no previous store found, create new
+    except Exception as e:
+        print(e)
+
+        if prints:
+            print('no previous storage found...')
+
+    if not os.path.exists(storage_directory):
+        os.mkdir(storage_directory)
+
+    with open(storage_directory + 'video_feeds.json', 'w', encoding='utf-8') as outfile:
+        json.dump(constructed_feeds, outfile)
+
+    # safety
+    outfile.close()
+    time.sleep(2)
 
     # return the data for manipulation
     return constructed_feeds
@@ -379,7 +500,7 @@ def get_video_sources(objects_file, storage_path, throughput_path, prints=True):
         os.mkdir(storage_path)
 
     # read the video_feeds
-    with open(objects_file) as objects_:
+    with open(objects_file, 'r', encoding='utf-8') as objects_:
         objects = json.load(objects_)
 
     # ensure safe close
@@ -463,7 +584,7 @@ def strip_audio(video_dir, audio_dir, video_in, audio_out):
 #   audio_dir: the specific audio directory to store, check_path_safety
 #   naming_function: a function to construct a name for the output video_file
 #   delete_video: boolean value to decide if you want to keep the video portion or discard after audio construction
-def strip_audio_from_directory(video_dir, audio_dir, video_dir_cleaning_function=rename_video_files, naming_function=video_to_audio_rename, end_path='transcripts/', delete_video=False, prints=True):
+def strip_audio_from_directory(video_dir, audio_dir, audio_dir_cleaning_function=clean_audio_filename, video_dir_cleaning_function=clean_video_filename, naming_function=video_to_audio_rename, end_path='transcripts/', delete_video=False, prints=True):
 
     # check_path_safety for all path variables
     video_dir = check_path_safety(video_dir)
@@ -473,7 +594,8 @@ def strip_audio_from_directory(video_dir, audio_dir, video_dir_cleaning_function
         os.mkdir(audio_dir)
 
     # ensure file naming conventions follow same pattern
-    video_dir_cleaning_function(video_dir)
+    rename_files(directory=audio_dir, cleaning_func=audio_dir_cleaning_function)
+    rename_files(directory=video_dir, cleaning_func=video_dir_cleaning_function)
 
     # set working directory to the video_dir
     os.chdir(video_dir)
@@ -699,11 +821,14 @@ def generate_transcript_from_audio_splits(audio_directory, naming_function=name_
             if prints:
                 progress(count=i, total=total_s)
 
+    if prints:
+        print('')
+
     # transcription fence post fix
     transcript = transcript[1:]
 
     # create and store the transcription in a file
-    with open(transcribed_name , "w") as outfile:
+    with open(transcribed_name , 'w', encoding='utf-8') as outfile:
         outfile.write(transcript)
 
     outfile.close()
@@ -815,7 +940,7 @@ def generate_words_from_doc(document, prints=True):
         print('started work on:', document, '...')
 
     # open the transcription file and read the content
-    with open(document) as transcript_file:
+    with open(document, 'r') as transcript_file:
         transcript = transcript_file.read()
 
     transcript_file.close()
@@ -879,10 +1004,11 @@ def generate_words_from_doc(document, prints=True):
 # generate_tfidf_from_directory for a directory of transcripts
 #   project_directory: the directory path where transcripts are stored
 #   output_file: the output file path to store the final tfidf json object
-def generate_tfidf_from_directory(project_directory, output_file, prints=True):
+def generate_tfidf_from_directory(project_directory, storage_directory, prints=True):
 
     # check_path_safety for project
     project_directory = check_path_safety(project_directory)
+    storage_directory = check_path_safety(storage_directory)
 
     # after check, set the directory to match
     os.chdir(project_directory)
@@ -961,8 +1087,11 @@ def generate_tfidf_from_directory(project_directory, output_file, prints=True):
         print('completed all files, storing and returning results for:', project_directory)
         print('----------------------------------------------------------------------------------------')
 
+    if not os.path.exists(storage_directory):
+        os.mkdir(storage_directory)
+
     # completed all computation, dump into output file
-    with open(output_file, 'w', encoding='utf-8') as outfile:
+    with open(storage_directory + 'tfidf.json', 'w') as outfile:
         json.dump(results, outfile)
 
     outfile.close()
@@ -980,7 +1109,7 @@ def generate_tfidf_from_directory(project_directory, output_file, prints=True):
 def predict_relevancy(search, tfidf_store, edit_distance=True, adjusted_distance_stop = 0.26, results=10):
 
     # open the locally stored json
-    with open(tfidf_store) as data_file:
+    with open(tfidf_store, 'r', encoding='utf-8') as data_file:
         tfidf_dict = json.load(data_file)
 
     data_file.close()
@@ -1170,7 +1299,7 @@ def get_local_data(packed_routes, os_path, prints=True):
     for path, routes in packed_routes.items():
 
         # open the locally stored json
-        with open(os_path + '_' + path + '.json') as data_file:
+        with open(os_path + '_' + path + '.json', 'r', encoding='utf-8') as data_file:
             local_data = json.load(data_file)
 
         data_file.close()

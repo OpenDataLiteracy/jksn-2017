@@ -5,3 +5,5 @@ Audio
 Video
 tfidf.json
 video_feeds.json
+stores
+local_store_events.json

@@ -1,0 +1,5 @@
+video_routes body name conventions
+cdp_runner json_directory parameter
+
+add storage_directory variable to cdp_runner for legistar data grab
+uncomment cdp_runner information
