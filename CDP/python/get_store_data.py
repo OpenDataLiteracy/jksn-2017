@@ -181,7 +181,7 @@ def get_data_by_routed(packed_routes, storage_directory, prints=True):
         cleaned_r = dict()
         for item in r:
             item = routes[2](item)
-            item = clean_time_data(item)
+            item = routes[4](item)
 
             try:
                 cleaned_r[item[routes[3]]].append(item)
@@ -191,7 +191,7 @@ def get_data_by_routed(packed_routes, storage_directory, prints=True):
 
         sorted_r = dict()
         for key, data in cleaned_r.items():
-            sorted_r[key] = sorted(data, key=lambda x: x['EventCalculatedTime'])
+            sorted_r[key] = sorted(data, key=lambda x: x[routes[5]])
 
         storage_path = storage_directory + 'local_store_' + path + '_by_' + routes[3] + '.json'
 
